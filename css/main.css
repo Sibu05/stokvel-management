@@ -1,0 +1,310 @@
+/* =============================================
+   main.css — Stokvel App shared styles
+   ============================================= */
+
+:root {
+  --cyan:       #00bcd4;
+  --cyan-dark:  #0097a7;
+  --cyan-light: #e0f7fa;
+  --black:      #111;
+  --grey:       #6b7280;
+  --light-grey: #f3f4f6;
+  --border:     #e5e7eb;
+  --white:      #ffffff;
+  --red:        #ef4444;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f8fafc;
+  color: #111;
+}
+
+/* --- Nav bar --- */
+nav {
+  background: var(--black);
+  padding: 0 32px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo {
+  color: var(--cyan);
+  font-weight: bold;
+  font-size: 16px;
+  letter-spacing: 2px;
+}
+
+.nav-page-name {
+  color: #888;
+  font-size: 13px;
+}
+
+/* --- Page wrapper --- */
+.page {
+  max-width: 660px;
+  margin: 0 auto;
+  padding: 36px 20px;
+}
+
+.page h1 {
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.page p.subtitle {
+  color: var(--grey);
+  font-size: 14px;
+  margin-bottom: 28px;
+}
+
+/* --- Card --- */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 24px;
+}
+
+/* --- Progress bar (ol > li — semantic ordered list) --- */
+ol.progress-bar {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 28px;
+  list-style: none;
+  padding: 0;
+}
+
+ol.progress-bar li.step-pill {
+  flex: 1;
+  text-align: center;
+  padding: 9px 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--grey);
+  background: #fafafa;
+  border-right: 1px solid var(--border);
+}
+
+ol.progress-bar li.step-pill:last-child {
+  border-right: none;
+}
+
+ol.progress-bar li.step-pill.active {
+  background: var(--black);
+  color: var(--cyan);
+  font-weight: bold;
+}
+
+ol.progress-bar li.step-pill.done {
+  background: var(--cyan-light);
+  color: var(--cyan-dark);
+}
+
+/* --- section = each wizard step (hidden attribute hides it) --- */
+section[hidden] {
+  display: none;
+}
+
+/* --- fieldset strips its default border --- */
+fieldset {
+  border: none;
+  padding: 0;
+  margin: 0 0 8px 0;
+}
+
+legend {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--grey);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 16px;
+}
+
+/* --- aside = drag placeholder area in Step 3 --- */
+aside#drag-area {
+  margin-top: 12px;
+}
+
+/* --- Form fields --- */
+.field {
+  margin-bottom: 18px;
+}
+
+.field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #374151;
+}
+
+.field label .req {
+  color: var(--red);
+  margin-left: 2px;
+}
+
+.field label .hint {
+  font-weight: normal;
+  color: var(--grey);
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  outline: none;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--cyan);
+}
+
+.field input.error-border {
+  border-color: var(--red);
+}
+
+/* --- Inline error text --- */
+.error-msg {
+  display: none;
+  color: var(--red);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.error-msg.show {
+  display: block;
+}
+
+/* --- Character counter --- */
+.char-count {
+  text-align: right;
+  font-size: 11px;
+  color: var(--grey);
+  margin-top: 3px;
+}
+
+/* --- Radio pills (Monthly / Weekly etc.) --- */
+.radio-group {
+  display: flex;
+  gap: 10px;
+}
+
+.radio-pill {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--grey);
+  cursor: pointer;
+}
+
+.radio-pill.selected {
+  border-color: var(--cyan);
+  background: var(--cyan-light);
+  color: var(--cyan-dark);
+}
+
+/* --- Buttons --- */
+.btn-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.btn {
+  padding: 10px 22px;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1.5px solid var(--black);
+  background: var(--black);
+  color: white;
+  font-weight: 600;
+}
+
+.btn:hover {
+  background: #333;
+}
+
+.btn.outline {
+  background: white;
+  color: var(--black);
+}
+
+.btn.outline:hover {
+  background: var(--light-grey);
+}
+
+.btn.cyan {
+  background: var(--cyan);
+  border-color: var(--cyan);
+  color: var(--black);
+}
+
+.btn.cyan:hover {
+  background: var(--cyan-dark);
+  border-color: var(--cyan-dark);
+}
+
+/* --- Review summary box (Step 4) --- */
+.review-box {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.review-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.review-row:last-child {
+  border-bottom: none;
+}
+
+.review-row .label {
+  color: var(--grey);
+}
+
+.review-row .value {
+  font-weight: 600;
+}
+
+/* --- Drag placeholder (Step 3) --- */
+.drag-placeholder-box {
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--grey);
+}
