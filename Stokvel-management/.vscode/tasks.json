@@ -1,0 +1,37 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "sqlproj: Build Stokvel-management",
+			"type": "process",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"c:/Users/innob/OneDrive/Desktop/Project/stokvel-management/Stokvel-management/Stokvel-management.sqlproj"
+			],
+			"problemMatcher": "$sqlproj-problem-matcher",
+			"isBackground": true,
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"detail": "Builds the Stokvel-management SQL project"
+		},
+		{
+			"label": "sqlproj: Build DatabaseProjectgroup_management",
+			"type": "process",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"c:/Users/innob/OneDrive/Desktop/Project/stokvel-management/Stokvel-management/DatabaseProjectgroup_management/DatabaseProjectgroup_management.sqlproj"
+			],
+			"problemMatcher": "$sqlproj-problem-matcher",
+			"isBackground": true,
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"detail": "Builds the DatabaseProjectgroup_management SQL project"
+		}
+	]
+}
