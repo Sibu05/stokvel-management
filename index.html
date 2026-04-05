@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stokvel App</title>
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+  <!-- ════════════════════════════════
+       NAV — always visible on every page
+       Clicking a link loads that page
+       into the <main> below
+       ════════════════════════════════ -->
+  <nav>
+    <span class="logo">STOKVEL</span>
+    <ul class="nav-links">
+      <li><button type="button" class="nav-btn active" onclick="loadPage('create-group')">Create group</button></li>
+      <li><button type="button" class="nav-btn"        onclick="loadPage('group-settings')">Settings</button></li>
+      <li><button type="button" class="nav-btn"        onclick="loadPage('invites')">Invites</button></li>
+    </ul>
+  </nav>
+
+
+  <!-- ════════════════════════════════
+       MAIN CONTENT AREA
+       Each page's HTML gets loaded
+       in here by app.js
+       ════════════════════════════════ -->
+  <main id="app-content" class="page">
+    <p class="loading-msg">Loading...</p>
+  </main>
+
+
+  <!-- app.js loads first — it handles page switching -->
+  <script src="js/app.js"></script>
+
+</body>
+</html>
