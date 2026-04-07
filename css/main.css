@@ -632,3 +632,56 @@ li.drag-item {
   color: #6b7280;
   margin-bottom: 14px;
 }
+/* ===== NAVBAR for index===== */
+nav {
+  background: #0a0a0a;
+  height: 60px;
+  padding: 0 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Logo */
+.logo {
+  color: #00bcd4;
+  font-weight: bold;
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+
+/* Nav links container */
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+/* Remove default list styling */
+.nav-links li {
+  display: inline;
+}
+
+/* Nav buttons (links) */
+.nav-btn {
+  text-decoration: none;
+  color: #aaa;
+  font-size: 14px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+/* Hover effect */
+.nav-btn:hover {
+  background: #1f2937;
+  color: #00bcd4;
+}
+
+/* Active page */
+.nav-btn.active {
+  background: #00bcd4;
+  color: black;
+  font-weight: 600;
+}
