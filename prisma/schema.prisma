@@ -8,31 +8,9 @@ datasource db {
 }
 
 model User {
-  id          String       @id @default(dbgenerated("newid()"))
-  providerId  String       @unique
-  email       String       @unique
-  name        String
-  role        String       @default("MEMBER")
-  createdAt   DateTime     @default(now())
-  memberships Membership[]
-}
-
-model Group {
-  id          String       @id @default(dbgenerated("newid()"))
-  name        String
-  description String?
-  createdAt   DateTime     @default(now())
-  memberships Membership[]
-}
-
-model Membership {
-  id       String   @id @default(dbgenerated("newid()"))
-  userId   String
-  groupId  String
-  role     String   @default("MEMBER")
-  joinedAt DateTime @default(now())
-  user     User     @relation(fields: [userId], references: [id])
-  group    Group    @relation(fields: [groupId], references: [id])
-
-  @@unique([userId, groupId])
+  id         String   @id @default(dbgenerated("newid()"))
+  providerId String   @unique
+  email      String   @unique
+  name       String
+  createdAt  DateTime @default(now())
 }
