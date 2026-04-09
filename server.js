@@ -1,32 +1,56 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+require('dotenv').config(); 
 
 const express = require('express');
+const path = require('path');
 const app = express();
 
-app.use(express.json()); 
+app.use(express.json());
+app.use(express.static('.'));
 
-// checking users table, I'm using it for my groups table
-app.get('/api/users', async (req, res) => {
+
+// This is the endpoint for registering a new user. It will be used by dev1 and dev2 to create new users in the database when they log in with Google for the first time. The providerId is the unique identifier from Google, and it will be used to check if the user already exists in the database. If the user already exists, we can skip creating a new user and just return the existing user data.
+app.post('/api/auth/register', async (req, res) => {
+  const { email, name, providerId } = req.body;
   try {
-    const users = await prisma.users.findMany();
-    res.json(users);
+    const newUser = await prisma.users.create({
+      data: {
+        providerId: providerId,
+        email: email,
+        name: name,
+        createdAt: new Date()
+      }
+    });
+    res.status(201).json(newUser);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ error: "Failed to create user", details: error.message });
+  }
+});
+
+//This is for logging in a user. It will check if the user exists in the database using the email. If the user exists, it will return the user data (or 404 otherwise). After that, they can use this login endpoint to get the user data for their session.
+app.post('/api/auth/login', async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await prisma.users.findUnique({
+      where: { email: email }
+    });
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).json({ error: "User not found" });
+    }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// Test user, I'm using it for my groups table
-app.post('/api/users/test', async (req, res) => {
+//This will get all the users drom the database to check if they exist and what other information we have about them.
+app.get('/api/users', async (req, res) => {
   try {
-    const testUser = await prisma.users.create({
-      data: {
-        providerId: "test_subject",
-        email: "test@example.com",
-        name: "Tester"
-      }
-    });
-    res.json(testUser);
+    const users = await prisma.users.findMany();
+    res.json(users);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -39,6 +63,7 @@ app.get('/api/groups', async (req, res) => {
     res.status(500).json({ error: "Failed to fetch groups" });
   }
 });
+
 
 //  Inserting a new group using post
 app.post('/api/groups', async (req, res) => {
@@ -64,8 +89,9 @@ app.post('/api/groups', async (req, res) => {
     res.status(400).json({ error: "Failed to create the group" });
   }
 });
-
-const PORT = 3000;
+//The port is from the .env file, if not found it defaults to 3000.
+const PORT = process.env.PORT || 3000; 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Open http://localhost:${PORT}/index.html to view the frontend`);
 });
