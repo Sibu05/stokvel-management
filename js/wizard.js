@@ -1,7 +1,8 @@
 // =============================================
 // wizard.js — Group creation wizard (CLEAN VERSION)
 // =============================================
-
+//I have added this to connect to my existing backend so that I can create groups.
+const API_BASE_URL = 'http://localhost:3000/api';
 // Which step the user is currently on
 var currentStep = 1;
 
@@ -152,6 +153,41 @@ function fillReview() {
 
 
 // ── Submit ───────────────────────────────────
-function submitGroup() {
-  alert('Group created! You will be directed to the group soon');
+async function submitGroup() {
+  const groupData = {
+    name: savedName,
+    description: savedDescription || null,
+    contributionAmount: parseFloat(savedAmount),
+    cycleType: savedCycle,
+    payoutOrder: "random",
+    status: "active",
+    createdBy: 1,  //Used the userid 1 as default for now, we will change this later
+    FiuserId: 1    // 
+  };
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/groups`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(groupData)
+    });
+
+    if (response.ok) {
+      const newGroup = await response.json();
+      alert(`Group "${newGroup.name}" created successfully! You will be directed to the group soon`);
+      // Optionally redirect after 2 seconds
+      setTimeout(() => {
+        window.location.href = '/index.html';
+      }, 2000);
+    } else {
+      const error = await response.json();
+      alert(`Error creating group: ${error.details || error.error}`);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error creating group. Please try again.');
+  }
 }
+

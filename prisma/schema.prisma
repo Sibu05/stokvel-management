@@ -34,14 +34,15 @@ model group_invites {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model group_members {
-  FgroupId Int
-  SuserId  Int
-  role     String   @db.VarChar(10)
-  joinedAt DateTime @db.Date
-  groups   groups   @relation(fields: [FgroupId], references: [groupId], onUpdate: NoAction, map: "FgroupId")
-  users    users    @relation(fields: [SuserId], references: [userId], onUpdate: NoAction, map: "SuserId")
+  group_memberId Int      @id(map: "PK_group_members") @default(autoincrement())
+  FgroupId       Int
+  SuserId        Int
+  role           String   @db.VarChar(10)
+  joinedAt       DateTime @db.Date
+  groups         groups   @relation(fields: [FgroupId], references: [groupId], onUpdate: NoAction, map: "FgroupId")
+  users          users    @relation(fields: [SuserId], references: [userId], onUpdate: NoAction, map: "SuserId")
 
-  @@ignore
+  
 }
 
 model groups {
@@ -57,7 +58,7 @@ model groups {
   FiuserId           Int
   group_audit_log    group_audit_log[]
   group_invites      group_invites[]
-  group_members      group_members[]   @ignore
+  group_members      group_members[]
   users              users             @relation(fields: [FiuserId], references: [userId], onUpdate: NoAction, map: "FiuserId")
 }
 
@@ -69,6 +70,6 @@ model users {
   createdAt       DateTime          @default(now(), map: "User_createdAt_df") @db.Date
   group_audit_log group_audit_log[]
   group_invites   group_invites[]
-  group_members   group_members[]   @ignore
+  group_members   group_members[]
   groups          groups[]
 }

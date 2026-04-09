@@ -65,30 +65,52 @@ app.get('/api/groups', async (req, res) => {
 });
 
 
-//  Inserting a new group using post
+
+// Inserting a new group using post
 app.post('/api/groups', async (req, res) => {
   const { name, description, contributionAmount, cycleType, payoutOrder, startDate, status, createdBy, FiuserId } = req.body; 
   try {
-    const newGroup = await prisma.groups.create({
-      data: {
-        name: name,
-        description: description,
-        contributionAmount: contributionAmount,
-        cycleType: cycleType,
-        payoutOrder: payoutOrder,
-        startDate: startDate ? new Date(startDate) : new Date(),
-        status: status,
-        createdBy: parseInt(createdBy),
-        FiuserId: parseInt(FiuserId),
-      },
+    // I will start by creating the group then I'll add the information to the group members table
+    const result = await prisma.$transaction(async (prisma) => {
+      // 1. Create the group
+      const newGroup = await prisma.groups.create({
+        data: {
+          name: name,
+          description: description,
+          contributionAmount: parseInt(contributionAmount),
+          cycleType: cycleType,
+          payoutOrder: payoutOrder,
+          startDate: new Date(), //I will automatically get the date
+          status: status,
+          createdBy: parseInt(createdBy),
+          FiuserId: parseInt(FiuserId),
+        },
+      });
+
+      // Add the creator of the group as admin to group_members table
+      const newMember = await prisma.group_members.create({
+        data: {
+          FgroupId: newGroup.groupId,
+          SuserId: parseInt(createdBy),
+          role: "admin",
+          joinedAt: new Date()
+        }
+      });
+
+      return { newGroup, newMember };
     });
-    res.status(201).json(newGroup);
+
+    res.status(201).json({
+      message: "Group created successfully",
+      group: result.newGroup,
+      member: result.newMember
+    });
   } catch (error) {
-    console.error("DETAILED ERROR:", error); 
-    //console.error(error);
-    res.status(400).json({ error: "Failed to create the group" });
+    console.error("DETAILED ERROR:", error);
+    res.status(400).json({ error: "Failed to create the group", details: error.message });
   }
 });
+
 //The port is from the .env file, if not found it defaults to 3000.
 const PORT = process.env.PORT || 3000; 
 app.listen(PORT, () => {
