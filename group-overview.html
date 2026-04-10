@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Group Overview – Stokvel App</title>
+  <link rel="stylesheet" href="group-overview.css" />
+</head>
+<body>
+
+  <main class="page">
+
+    <!-- Top bar: group switcher and refresh button -->
+    <header class="top-bar">
+      <section class="group-switcher">
+        <label for="group-select">Group</label>
+        <select id="group-select"></select>
+      </section>
+      <button id="refresh-btn">↻ Refresh</button>
+    </header>
+
+    <!-- Status banner: only shown when group is paused or closed -->
+    <p id="status-banner" class="status-banner" hidden></p>
+
+    <!-- Group name, description, status badge -->
+    <article class="card" id="group-header">
+      <header class="group-title-row">
+        <h1 id="group-name"></h1>
+        <span id="status-badge" class="badge"></span>
+      </header>
+      <p id="group-desc" class="group-desc"></p>
+
+      <!-- Cycle info and progress bar -->
+      <p id="cycle-label" class="cycle-label"></p>
+      <p id="cycle-days" class="cycle-days"></p>
+      <progress id="cycle-progress" max="100" value="0"></progress>
+    </article>
+
+    <!-- Quick stats: members, contribution amount, cycle type -->
+    <section class="quick-stats">
+      <article class="stat-card">
+        <p class="stat-label">Members</p>
+        <p id="stat-members" class="stat-value"></p>
+      </article>
+      <article class="stat-card">
+        <p class="stat-label">Contribution</p>
+        <p id="stat-amount" class="stat-value"></p>
+      </article>
+      <article class="stat-card">
+        <p class="stat-label">Cycle type</p>
+        <p id="stat-cycle" class="stat-value"></p>
+      </article>
+    </section>
+
+    <!-- Next payout card -->
+    <article class="card">
+      <h2 class="card-title">Next payout</h2>
+      <section class="payout-row">
+        <span id="payout-avatar" class="avatar"></span>
+        <section class="payout-info">
+          <p id="payout-name" class="payout-name"></p>
+          <p id="payout-date" class="payout-date"></p>
+        </section>
+        <section id="payout-countdown" class="payout-countdown">
+          <p id="countdown-num" class="countdown-num"></p>
+          <p class="countdown-label">days left</p>
+        </section>
+      </section>
+    </article>
+
+    <!-- Members grid -->
+    <article class="card">
+      <h2 class="card-title">Members this cycle</h2>
+      <ul id="members-grid" class="members-grid"></ul>
+    </article>
+
+    <!-- View rules button -->
+    <footer class="rules-footer">
+      <button id="view-rules-btn">View rules</button>
+    </footer>
+
+  </main>
+
+
+  <!-- Contribution rules modal -->
+  <!-- hidden by default — JS shows it when the member clicks "View rules" -->
+  <aside id="rules-modal" class="modal-overlay" hidden>
+    <article class="modal">
+
+      <header class="modal-header">
+        <h2 class="modal-title">Contribution Rules</h2>
+        <button id="close-modal-btn" class="modal-close" aria-label="Close rules">✕</button>
+      </header>
+
+      <p class="readonly-notice">Set by your group admin. Contact your admin if anything needs to change.</p>
+
+      <section class="modal-section highlight-section">
+        <p class="section-label">Contribution amount</p>
+        <p id="modal-amount" class="amount-display"></p>
+        <p id="modal-cycle-summary" class="cycle-summary"></p>
+      </section>
+
+      <section class="modal-section">
+        <h3 class="section-title">Payout order</h3>
+        <p class="section-desc">Each member receives the full pot once per cycle, in the order below.</p>
+        <ol id="modal-payout-order" class="payout-list"></ol>
+      </section>
+
+      <section class="modal-section" id="modal-penalty-section" hidden>
+        <h3 class="section-title">Penalty rules</h3>
+        <p id="modal-penalty-rules" class="penalty-text"></p>
+      </section>
+
+      <footer class="modal-footer">
+        <button onclick="window.print()" class="print-btn">Print a copy</button>
+      </footer>
+
+    </article>
+  </aside>
+
+  <script src="group-overview.js"></script>
+</body>
+</html>

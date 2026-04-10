@@ -1,0 +1,498 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #f4f4f0;
+  color: #111;
+  min-height: 100vh;
+}
+
+/* ── Page layout ── */
+.page {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+/* ── Top bar ── */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.group-switcher label {
+  font-size: 13px;
+  color: #666;
+  margin-right: 8px;
+}
+
+.group-switcher select {
+  font-size: 13px;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  color: #111;
+  cursor: pointer;
+}
+
+#refresh-btn {
+  font-size: 12px;
+  padding: 6px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  color: #666;
+  cursor: pointer;
+}
+
+#refresh-btn:hover {
+  background: #f0f0ec;
+}
+
+/* ── Status banner ── */
+/* shown/hidden via JS using the `hidden` attribute */
+.status-banner {
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.status-banner.closed {
+  background: #F1EFE8;
+  color: #5F5E5A;
+  border-left: 3px solid #B4B2A9;
+}
+
+/* ── Card ── */
+.card {
+  background: #fff;
+  border: 1px solid #e0e0da;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.card-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 1rem;
+}
+
+/* ── Group header card ── */
+.group-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+h1 {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.group-desc {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+/* Status badge next to the group name */
+.badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.badge.active { background: #EAF3DE; color: #3B6D11; }
+.badge.closed { background: #F1EFE8; color: #5F5E5A; }
+
+.cycle-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.cycle-days {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+/* Native HTML progress bar — styled via appearance:none */
+progress {
+  width: 100%;
+  height: 6px;
+  border-radius: 99px;
+  appearance: none;
+  border: none;
+  overflow: hidden;
+}
+
+progress::-webkit-progress-bar  { background: #e8e8e4; border-radius: 99px; }
+progress::-webkit-progress-value { background: #1D9E75; border-radius: 99px; }
+progress::-moz-progress-bar     { background: #1D9E75; border-radius: 99px; }
+
+/* ── Quick stats ── */
+.quick-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.stat-card {
+  background: #f0f0ec;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.stat-label { font-size: 11px; color: #888; margin-bottom: 4px; }
+.stat-value { font-size: 18px; font-weight: 500; }
+
+/* ── Next payout card ── */
+.payout-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Circular avatar showing initials */
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #E6F1FB;
+  color: #185FA5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.payout-info { flex: 1; }
+.payout-name { font-size: 15px; font-weight: 500; }
+.payout-date { font-size: 13px; color: #666; margin-top: 2px; }
+
+.payout-countdown { text-align: right; }
+.countdown-num   { font-size: 26px; font-weight: 500; color: #1D9E75; line-height: 1; }
+.countdown-label { font-size: 11px; color: #888; margin-top: 2px; }
+
+/* ── Members grid ── */
+
+/* ul resets — remove bullet points and default list padding */
+.members-grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+}
+
+/* Each member is a list item <li> */
+.member-card {
+  background: #f0f0ec;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.member-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Rotate through 4 colours for member avatars */
+.av-teal   { background: #E1F5EE; color: #0F6E56; }
+.av-blue   { background: #E6F1FB; color: #185FA5; }
+.av-purple { background: #EEEDFE; color: #534AB7; }
+.av-coral  { background: #FAECE7; color: #993C1D; }
+
+.member-name {
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* ── Footer ── */
+.rules-footer {
+  text-align: center;
+  padding-bottom: 0.5rem;
+}
+
+#view-rules-btn {
+  font-size: 13px;
+  padding: 8px 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  color: #666;
+  cursor: pointer;
+}
+
+#view-rules-btn:hover {
+  background: #f0f0ec;
+}
+
+/* ── Modal overlay ── */
+/* covers the entire screen behind the modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1rem;
+}
+
+/* The hidden attribute sets display:none but display:flex above overrides it.
+   This rule restores the expected behaviour — [hidden] always means invisible. */
+.modal-overlay[hidden] {
+  display: none;
+}
+
+/* The modal box itself */
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;        /* never taller than 90% of the screen */
+  overflow-y: auto;        /* scroll inside the modal if content is long */
+  padding: 1.5rem;
+}
+
+/* Modal header: title + close button side by side */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/* X button to close the modal */
+.modal-close {
+  font-size: 16px;
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.modal-close:hover {
+  background: #f0f0ec;
+  color: #111;
+}
+
+/* Read-only notice */
+.readonly-notice {
+  font-size: 12px;
+  color: #888;
+  background: #f0f0ec;
+  border-left: 3px solid #ccc;
+  padding: 8px 12px;
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 1.25rem;
+}
+
+/* Each section inside the modal */
+.modal-section {
+  margin-bottom: 1.25rem;
+}
+
+/* Green-tinted section for the contribution amount */
+.highlight-section {
+  background: #f0f9f4;
+  border: 1px solid #b6e0cb;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #3B6D11;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+/* Large prominent amount e.g. R 500,00 */
+.amount-display {
+  font-size: 38px;
+  font-weight: 600;
+  color: #1D9E75;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+/* Plain-language summary e.g. "Due every month on the 1st" */
+.cycle-summary {
+  font-size: 13px;
+  color: #3B6D11;
+}
+
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+.section-desc {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+/* Payout order list */
+.payout-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.payout-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid #f0f0ec;
+  font-size: 13px;
+}
+
+.payout-list li:last-child {
+  border-bottom: none;
+}
+
+/* Position number circle */
+.payout-position {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #E6F1FB;
+  color: #185FA5;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Highlight the current user's row */
+.payout-list li.current-user .payout-position {
+  background: #1D9E75;
+  color: #fff;
+}
+
+.payout-member-name {
+  flex: 1;
+  font-weight: 500;
+}
+
+/* "You" tag next to the current user's name */
+.you-tag {
+  font-size: 10px;
+  font-weight: 600;
+  background: #EAF3DE;
+  color: #3B6D11;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.payout-date {
+  font-size: 12px;
+  color: #666;
+}
+
+.penalty-text {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.6;
+}
+
+/* Modal footer with print button */
+.modal-footer {
+  text-align: center;
+  padding-top: 1rem;
+  border-top: 1px solid #f0f0ec;
+  margin-top: 0.5rem;
+}
+
+.print-btn {
+  font-size: 13px;
+  padding: 8px 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  color: #666;
+  cursor: pointer;
+}
+
+.print-btn:hover {
+  background: #f0f0ec;
+}
+
+/* ── Print styles ── */
+@media print {
+  .modal-overlay {
+    position: static;
+    background: none;
+    padding: 0;
+  }
+  .modal {
+    max-height: none;
+    box-shadow: none;
+  }
+  .modal-close,
+  .print-btn,
+  .readonly-notice,
+  .top-bar,
+  .rules-footer {
+    display: none;
+  }
+}
