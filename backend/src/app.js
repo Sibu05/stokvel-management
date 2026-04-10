@@ -20,7 +20,14 @@ app.get('/health', (_, res) => res.json({ status: 'ok' }));
 
 // Returns the logged in user's profile
 // requireAuth verifies token and upserts user in DB
-app.get('/me', requireAuth, (req, res) => res.json({ user: req.user }));
+app.get('/me', requireAuth, (req, res) => {
+  try {
+    res.json({ user: req.user });
+  } catch (err) {
+    console.error('Error in /me route:', err);
+    res.status(500).json({ error: 'Failed to get user' });
+  }
+});
 
 // Global error handler
 app.use((err, req, res, next) => {
