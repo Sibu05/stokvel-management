@@ -1,6 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-require('dotenv').config(); 
+require('dotenv').
+config(); 
 
 
 const crypto = require('crypto');
@@ -16,7 +17,7 @@ function generateUniqueToken() {
   return crypto.randomBytes(32).toString('hex');
 }
 
-const { requireAuth } = require('./middleware/auth');
+const { requireAuth } = require('./backend/src/middleware/auth');
 
 app.get('/api/auth/me', requireAuth, (req, res) => {
   res.json({
