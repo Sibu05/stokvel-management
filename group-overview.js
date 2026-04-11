@@ -1,105 +1,75 @@
 // ─── Mock data ────────────────────────────────────────────────────────────────
-// This stands in for the real API response from GET /groups/:id/dashboard
-// When Dev 5 has the endpoint ready, delete this object and update fetchGroup()
-const MOCK_GROUPS = {
-  "group-1": {
-    id: "group-1",
-    name: "Soweto Savers",
-    description: "A 10-member rotating savings group focused on building household emergency funds and year-end bonuses.",
-    status: "active",                  // "active" | "closed" — paused is not a valid status
-    cycle: {
-      number: 4,
-      total: 10,
-      startDate: "2026-05-01",         // ISO 8601 date string
-      endDate: "2026-05-31",
-      progressPercent: 45,             // how far through the cycle we are
-      daysRemaining: 17
-    },
-    stats: {
-      totalMembers: 10,
-      contributionAmountCents: 50000,  // stored in cents to avoid float errors (R500.00)
-      cycleType: "Monthly"
-    },
-    nextPayout: {
-      recipientName: "Nompumelelo Mokoena",
-      payoutDate: "2026-05-31",
-      daysRemaining: 17
-    },
-    members: [
-      { id: "m1",  name: "Thabo Nkosi"          },
-      { id: "m2",  name: "Nompumelelo Mokoena"   },
-      { id: "m3",  name: "Sipho Dlamini"         },
-      { id: "m4",  name: "Zanele Khumalo"        },
-      { id: "m5",  name: "Lerato Molefe"         },
-      { id: "m6",  name: "Bongani Sithole"       },
-      { id: "m7",  name: "Nomsa Zulu"            },
-      { id: "m8",  name: "Mpho Radebe"           },
-      { id: "m9",  name: "Thandeka Ndlovu"       },
-      { id: "m10", name: "Lungelo Mthembu"       }
-    ]
-  },
-  "group-2": {
-    id: "group-2",
-    name: "Mzansi Builders",
-    description: "A closed group that completed its full rotation cycle in March 2026.",
-    status: "closed",                  // all cycles done — group is no longer active
-    cycle: {
-      number: 8,
-      total: 8,
-      startDate: "2026-03-01",
-      endDate: "2026-03-31",
-      progressPercent: 100,
-      daysRemaining: 0
-    },
-    stats: {
-      totalMembers: 8,
-      contributionAmountCents: 75000,
-      cycleType: "Monthly"
-    },
-    nextPayout: {
-      recipientName: "—",
-      payoutDate: null,                // null because all cycles are complete
-      daysRemaining: null
-    },
-    members: [
-      { id: "m1", name: "Vusi Shabalala"  },
-      { id: "m2", name: "Ntombi Msweli"   },
-      { id: "m3", name: "Lebo Mokwena"    },
-      { id: "m4", name: "Oupa Motsepe"    },
-      { id: "m5", name: "Zanele Dube"     },
-      { id: "m6", name: "Sipho Nkosi"     },
-      { id: "m7", name: "Refilwe Mokoena" },
-      { id: "m8", name: "Bonga Sithole"   }
-    ]
-  }
-};  // closes MOCK_GROUPS
+// GET /api/groups_members/:userId already gives us: name, description,
+// contributionAmount, cycleType, status, startDate, members, totalMembers
+//
+// Still mocked because Dev 5 has not built these yet:
+//   - cycle number, total, progress, daysRemaining
+//   - nextPayout (recipient, date, daysRemaining)
+//   - rules: dueDayOfMonth, penaltyRules, payoutOrder
+//
+// TODO: remove MOCK_CYCLE and MOCK_NEXT_PAYOUT when Dev 5 adds cycle/payout data
+// TODO: remove MOCK_RULES when GET /api/groups/:id/rules is ready
+const MOCK_CYCLE = {
+  number: 4,
+  total: 10,
+  endDate: "2026-05-31",
+  progressPercent: 45,
+  daysRemaining: 17
+};
 
+const MOCK_NEXT_PAYOUT = {
+  recipientName: "Nompumelelo Mokoena",
+  payoutDate: "2026-05-31",
+  daysRemaining: 17
+};
 
-// Four avatar background/text colour pairs — we rotate through these by member index
+const MOCK_RULES = {
+  dueDayOfMonth: 1,
+  penaltyRules: "Any member who misses a contribution will be given a 7-day grace period. After that, a penalty of R50 is added for every additional week the contribution remains unpaid.",
+  payoutOrder: [
+    { memberId: 1,  name: "Thabo Nkosi",         payoutDate: "2026-02-28" },
+    { memberId: 2,  name: "Nompumelelo Mokoena",  payoutDate: "2026-03-31" },
+    { memberId: 3,  name: "Sipho Dlamini",        payoutDate: "2026-04-30" },
+    { memberId: 4,  name: "Zanele Khumalo",       payoutDate: "2026-05-31" },
+    { memberId: 5,  name: "Lerato Molefe",        payoutDate: "2026-06-30" },
+    { memberId: 6,  name: "Bongani Sithole",      payoutDate: "2026-07-31" },
+    { memberId: 7,  name: "Nomsa Zulu",           payoutDate: "2026-08-31" },
+    { memberId: 8,  name: "Mpho Radebe",          payoutDate: "2026-09-30" },
+    { memberId: 9,  name: "Thandeka Ndlovu",      payoutDate: "2026-10-31" },
+    { memberId: 10, name: "Lungelo Mthembu",      payoutDate: "2026-11-30" }
+  ]
+};
+
+// The logged-in member's userId — used to highlight their row in the payout list
+// TODO: replace with the real userId from Dev 2's auth system e.g. auth.user.userId
+const CURRENT_USER_ID = 1;
+
+// Four avatar colour pairs — rotated by member index
 const AVATAR_COLOURS = ["av-teal", "av-blue", "av-purple", "av-coral"];
 
 
-// ─── Helper functions ──────────────────────────────────────────────────────────
+// ─── Helper functions ─────────────────────────────────────────────────────────
 
 // Takes a full name like "Nompumelelo Mokoena" and returns "NM"
-// .split(" ")  → ["Nompumelelo", "Mokoena"]
-// .slice(0, 2) → take only the first two words (handles middle names)
-// .map(w => w[0]) → take the first letter of each word
-// .join("")    → stick them together → "NM"
-// .toUpperCase() → make sure they're capital letters
+// .split(" ")     -> ["Nompumelelo", "Mokoena"]
+// .slice(0, 2)    -> take only the first two words (handles middle names)
+// .map(w => w[0]) -> take the first letter of each word
+// .join("")       -> stick them together -> "NM"
+// .toUpperCase()  -> make sure they are capital letters
 function getInitials(name) {
   return name.trim().split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase();
 }
 
-// Converts cents (integer) to a ZAR currency string e.g. 50000 → "R 500,00"
-// We store money in cents to avoid floating point bugs (e.g. 0.1 + 0.2 !== 0.3)
-// Intl.NumberFormat is the browser's built-in currency formatter
-function formatCurrency(cents) {
+// Converts a number to a ZAR currency string e.g. 500 -> "R 500,00"
+// Dev 5 stores contributionAmount as a full number (not cents)
+// so we do NOT divide by 100 here
+// Intl.NumberFormat is the browser built-in currency formatter
+function formatCurrency(amount) {
   return new Intl.NumberFormat("en-ZA", {
     style: "currency",
     currency: "ZAR",
     minimumFractionDigits: 2
-  }).format(cents / 100);
+  }).format(amount);
 }
 
 // Converts an ISO date string like "2026-05-31" into "31 May 2026"
@@ -114,52 +84,88 @@ function formatDate(iso) {
   });
 }
 
+// Builds plain-language due date e.g. "Due every month on the 1st"
+function buildCycleSummary(cycleType, dueDayOfMonth) {
+  const suffixes = ["th", "st", "nd", "rd"];
+  const remainder = dueDayOfMonth % 100;
+  // 11, 12, 13 are exceptions — they always use "th"
+  const suffix = (remainder >= 11 && remainder <= 13)
+    ? "th"
+    : suffixes[dueDayOfMonth % 10] || "th";
+  return "Due every " + cycleType.toLowerCase() + " on the " + dueDayOfMonth + suffix;
+}
 
-// ─── API fetch ────────────────────────────────────────────────────────────────
 
-// Loads a group's dashboard data.
-// Currently returns mock data after a short delay to simulate a network call.
-//
-// TODO: when Dev 5's API is ready, replace the body with:
-//   const response = await fetch(`/api/groups/${groupId}/dashboard`);
-//   if (!response.ok) throw new Error("Failed to load group");
+// ─── API calls ────────────────────────────────────────────────────────────────
+
+// REAL — fetches all groups the logged-in user belongs to
+// GET /api/groups_members/:userId
+// Dev 5's API returns a flat array — each item has:
+// { groupId, name, description, contributionAmount, cycleType, status,
+//   startDate, payoutOrder, totalMembers, members: [{ userId, name, email, role }],
+//   createdBy: { userId, name, email }, userRole }
+// TODO: replace hardcoded userId with Dev 2's auth e.g. auth.user.userId
+async function fetchUserGroups(userId) {
+  const response = await fetch("/api/groups_members/" + userId);
+  if (!response.ok) throw new Error("Failed to load groups");
+  return await response.json();
+}
+
+// MOCK — cycle and payout data not yet in Dev 5's API
+// TODO: remove this and use real data once Dev 5 adds cycle/payout fields
+function getMockCycleAndPayout() {
+  return {
+    cycle: MOCK_CYCLE,
+    nextPayout: MOCK_NEXT_PAYOUT
+  };
+}
+
+// MOCK — rules not yet in Dev 5's API
+// TODO: replace with real fetch when GET /api/groups/:id/rules is ready:
+//   const response = await fetch("/api/groups/" + groupId + "/rules");
+//   if (!response.ok) throw new Error("Failed to load rules");
 //   return await response.json();
-function fetchGroup(groupId) {
-  // Promise lets us write async-style code (loading states, error handling)
-  // setTimeout simulates the delay of a real network request
+function fetchRules(groupId) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      const data = MOCK_GROUPS[groupId];
-      if (data) resolve(data);
-      else reject(new Error("Group not found"));
-    }, 500);
+      // For now all groups use the same mock rules
+      // When the real endpoint exists it will return rules specific to each group
+      resolve(MOCK_RULES);
+    }, 400);
   });
 }
 
 
 // ─── DOM references ───────────────────────────────────────────────────────────
-// We grab all the elements we'll be updating once at the top,
+// We grab all the elements we will be updating once at the top,
 // rather than searching for them every time we render.
 
-const groupSelect    = document.getElementById("group-select");
-const refreshBtn     = document.getElementById("refresh-btn");
-const statusBanner   = document.getElementById("status-banner");
-const groupNameEl    = document.getElementById("group-name");
-const statusBadgeEl  = document.getElementById("status-badge");
-const groupDescEl    = document.getElementById("group-desc");
-const cycleLabelEl   = document.getElementById("cycle-label");
-const cycleDaysEl    = document.getElementById("cycle-days");
-const cycleProgress  = document.getElementById("cycle-progress");
-const statMembersEl  = document.getElementById("stat-members");
-const statAmountEl   = document.getElementById("stat-amount");
-const statCycleEl    = document.getElementById("stat-cycle");
-const payoutAvatarEl = document.getElementById("payout-avatar");
-const payoutNameEl   = document.getElementById("payout-name");
-const payoutDateEl   = document.getElementById("payout-date");
-const countdownEl    = document.getElementById("payout-countdown");
-const countdownNumEl = document.getElementById("countdown-num");
-const membersGrid    = document.getElementById("members-grid");
-const viewRulesBtn   = document.getElementById("view-rules-btn");
+const groupSelect         = document.getElementById("group-select");
+const refreshBtn          = document.getElementById("refresh-btn");
+const statusBanner        = document.getElementById("status-banner");
+const groupNameEl         = document.getElementById("group-name");
+const statusBadgeEl       = document.getElementById("status-badge");
+const groupDescEl         = document.getElementById("group-desc");
+const cycleLabelEl        = document.getElementById("cycle-label");
+const cycleDaysEl         = document.getElementById("cycle-days");
+const cycleProgress       = document.getElementById("cycle-progress");
+const statMembersEl       = document.getElementById("stat-members");
+const statAmountEl        = document.getElementById("stat-amount");
+const statCycleEl         = document.getElementById("stat-cycle");
+const payoutAvatarEl      = document.getElementById("payout-avatar");
+const payoutNameEl        = document.getElementById("payout-name");
+const payoutDateEl        = document.getElementById("payout-date");
+const countdownEl         = document.getElementById("payout-countdown");
+const countdownNumEl      = document.getElementById("countdown-num");
+const membersGrid         = document.getElementById("members-grid");
+const viewRulesBtn        = document.getElementById("view-rules-btn");
+const rulesModal          = document.getElementById("rules-modal");
+const closeModalBtn       = document.getElementById("close-modal-btn");
+const modalAmount         = document.getElementById("modal-amount");
+const modalCycleSummary   = document.getElementById("modal-cycle-summary");
+const modalPayoutOrder    = document.getElementById("modal-payout-order");
+const modalPenaltySection = document.getElementById("modal-penalty-section");
+const modalPenaltyRules   = document.getElementById("modal-penalty-rules");
 
 
 // ─── Render functions ─────────────────────────────────────────────────────────
@@ -168,42 +174,45 @@ const viewRulesBtn   = document.getElementById("view-rules-btn");
 // A stokvel cannot be paused, only active or closed
 function renderBanner(status) {
   if (status === "active") {
-    // `hidden` is a built-in HTML attribute that hides the element
     statusBanner.hidden = true;
     return;
   }
-
   // status === "closed"
   statusBanner.textContent = "This group is closed. All cycles have been completed.";
-  statusBanner.className = "status-banner closed";
-  statusBanner.hidden = false;
+  statusBanner.className   = "status-banner closed";
+  statusBanner.hidden      = false;
 }
 
-// Fills in the group header card (name, badge, description, cycle, progress bar)
-function renderGroupHeader(group) {
+// Fills in the group header card
+// Uses real API fields: group.name, group.description, group.status, group.startDate
+// Uses mock fields: cycle.number, cycle.total, cycle.endDate, cycle.daysRemaining, cycle.progressPercent
+function renderGroupHeader(group, cycle) {
   groupNameEl.textContent = group.name;
 
   statusBadgeEl.textContent = group.status.charAt(0).toUpperCase() + group.status.slice(1);
-  statusBadgeEl.className = "badge " + group.status; // e.g. "badge active"
+  statusBadgeEl.className   = "badge " + group.status;
 
   groupDescEl.textContent = group.description;
 
-  const c = group.cycle;
-  cycleLabelEl.textContent = `Cycle ${c.number} of ${c.total} · ${formatDate(c.startDate)} – ${formatDate(c.endDate)}`;
-  cycleDaysEl.textContent  = c.daysRemaining > 0 ? `${c.daysRemaining} days remaining` : "Cycle ended";
+  // group.startDate comes from the real API
+  // cycle.number, cycle.total, cycle.endDate, cycle.daysRemaining come from mock
+  cycleLabelEl.textContent = "Cycle " + cycle.number + " of " + cycle.total + " · " + formatDate(group.startDate) + " – " + formatDate(cycle.endDate);
+  cycleDaysEl.textContent  = cycle.daysRemaining > 0 ? cycle.daysRemaining + " days remaining" : "Cycle ended";
 
   // <progress> is a native HTML element — just set its value attribute
-  cycleProgress.value = c.progressPercent;
+  cycleProgress.value = cycle.progressPercent;
 }
 
 // Fills in the three quick-stat cards
-function renderStats(stats) {
-  statMembersEl.textContent = stats.totalMembers;
-  statAmountEl.textContent  = formatCurrency(stats.contributionAmountCents);
-  statCycleEl.textContent   = stats.cycleType;
+// Uses real API fields: group.totalMembers, group.contributionAmount, group.cycleType
+function renderStats(group) {
+  statMembersEl.textContent = group.totalMembers;
+  statAmountEl.textContent  = formatCurrency(group.contributionAmount); // real API field
+  statCycleEl.textContent   = group.cycleType;
 }
 
 // Fills in the next payout card
+// Uses mock nextPayout data until Dev 5 adds this to the API
 function renderNextPayout(nextPayout) {
   payoutAvatarEl.textContent = getInitials(nextPayout.recipientName);
   payoutNameEl.textContent   = nextPayout.recipientName;
@@ -221,9 +230,8 @@ function renderNextPayout(nextPayout) {
 }
 
 // Builds the members grid — one <li> per member
-// Members only see names and avatars — contribution statuses are hidden
-// because Sprint 1 story 4 is about understanding your own obligations,
-// not seeing what other members have or haven't paid
+// Uses real API field: group.members — each member has { userId, name, email, role }
+// Members only see names and avatars — no contribution statuses shown
 function renderMembers(members) {
   // Clear whatever was in the list before (previous group's members)
   membersGrid.innerHTML = "";
@@ -232,16 +240,15 @@ function renderMembers(members) {
     const li = document.createElement("li");
     li.className = "member-card";
 
-    // Avatar circle showing the member's initials
-    // We use % to wrap the colour index: member 0→teal, 1→blue, 2→purple, 3→coral, 4→teal again...
+    // Avatar circle — colour rotates by index using %
     const avatar = document.createElement("span");
-    avatar.className = "member-avatar " + AVATAR_COLOURS[index % AVATAR_COLOURS.length];
-    avatar.textContent = getInitials(member.name);
+    avatar.className   = "member-avatar " + AVATAR_COLOURS[index % AVATAR_COLOURS.length];
+    avatar.textContent = getInitials(member.name); // member.name from real API
     li.appendChild(avatar);
 
-    // Member's full name
+    // Member full name
     const name = document.createElement("p");
-    name.className = "member-name";
+    name.className   = "member-name";
     name.textContent = member.name;
     li.appendChild(name);
 
@@ -249,166 +256,38 @@ function renderMembers(members) {
   });
 }
 
+// Populates and opens the contribution rules modal
+// contributionAmount and cycleType come from the real API (passed in as group)
+// dueDayOfMonth, penaltyRules, payoutOrder come from mock rules
+function openRulesModal(group, rules) {
+  // Use real API contributionAmount and cycleType
+  // Use mock dueDayOfMonth until Dev 5 adds it
+  modalAmount.textContent       = formatCurrency(group.contributionAmount);
+  modalCycleSummary.textContent = buildCycleSummary(group.cycleType, rules.dueDayOfMonth);
 
-// ─── Main load function ───────────────────────────────────────────────────────
-
-// Called on page load, when the user switches groups, and when they click Refresh.
-// It fetches the group data then calls each render function with the relevant piece.
-async function loadGroup(groupId) {
-  refreshBtn.textContent = "Loading…";
-  refreshBtn.disabled = true;
-
-  try {
-    const group = await fetchGroup(groupId);
-
-    // Each render function is responsible for one section of the page
-    renderBanner(group.status);
-    renderGroupHeader(group);
-    renderStats(group.stats);
-    renderNextPayout(group.nextPayout);
-    renderMembers(group.members);
-
-  } catch (error) {
-    // If the fetch fails, show the error in the banner
-    statusBanner.textContent = "Error: " + error.message;
-    statusBanner.className = "status-banner closed";
-    statusBanner.hidden = false;
-
-  } finally {
-    // `finally` runs whether the fetch succeeded or failed
-    refreshBtn.textContent = "↻ Refresh";
-    refreshBtn.disabled = false;
-  }
-}
-
-
-// ─── Populate group switcher dropdown ─────────────────────────────────────────
-
-// Build one <option> per group and add it to the <select>
-Object.values(MOCK_GROUPS).forEach(group => {
-  const option = document.createElement("option");
-  option.value = group.id;
-  option.textContent = group.name;
-  groupSelect.appendChild(option);
-});
-
-
-// ─── Event listeners ──────────────────────────────────────────────────────────
-
-// When the user picks a different group from the dropdown, load it
-groupSelect.addEventListener("change", () => {
-  loadGroup(groupSelect.value);
-});
-
-// Refresh button reloads the currently selected group
-refreshBtn.addEventListener("click", () => {
-  loadGroup(groupSelect.value);
-});
-
-
-
-// ─── Initial page load ────────────────────────────────────────────────────────
-// Load the first group when the page opens
-loadGroup("group-1");
-
-
-// ─── Contribution rules mock data ─────────────────────────────────────────────
-// Rules are set by the group Admin — members can only read them, never edit them
-// TODO: replace with real fetch to GET /groups/:id/rules when Dev 5 is ready
-const MOCK_RULES = {
-  "group-1": {
-    contributionAmountCents: 50000,
-    cycleType: "Monthly",
-    dueDayOfMonth: 1,
-    penaltyRules: "Any member who misses a contribution will be given a 7-day grace period. After that, a penalty of R50 is added for every additional week the contribution remains unpaid.",
-    payoutOrder: [
-      { memberId: "m1",  name: "Thabo Nkosi",         payoutDate: "2026-02-28" },
-      { memberId: "m2",  name: "Nompumelelo Mokoena",  payoutDate: "2026-03-31" },
-      { memberId: "m3",  name: "Sipho Dlamini",        payoutDate: "2026-04-30" },
-      { memberId: "m4",  name: "Zanele Khumalo",       payoutDate: "2026-05-31" },
-      { memberId: "m5",  name: "Lerato Molefe",        payoutDate: "2026-06-30" },
-      { memberId: "m6",  name: "Bongani Sithole",      payoutDate: "2026-07-31" },
-      { memberId: "m7",  name: "Nomsa Zulu",           payoutDate: "2026-08-31" },
-      { memberId: "m8",  name: "Mpho Radebe",          payoutDate: "2026-09-30" },
-      { memberId: "m9",  name: "Thandeka Ndlovu",      payoutDate: "2026-10-31" },
-      { memberId: "m10", name: "Lungelo Mthembu",      payoutDate: "2026-11-30" }
-    ]
-  },
-  "group-2": {
-    contributionAmountCents: 75000,
-    cycleType: "Monthly",
-    dueDayOfMonth: 5,
-    penaltyRules: null,
-    payoutOrder: [
-      { memberId: "m1", name: "Vusi Shabalala",  payoutDate: "2026-01-31" },
-      { memberId: "m2", name: "Ntombi Msweli",   payoutDate: "2026-02-28" },
-      { memberId: "m3", name: "Lebo Mokwena",    payoutDate: "2026-03-31" },
-      { memberId: "m4", name: "Oupa Motsepe",    payoutDate: "2026-04-30" },
-      { memberId: "m5", name: "Zanele Dube",     payoutDate: "2026-05-31" },
-      { memberId: "m6", name: "Sipho Nkosi",     payoutDate: "2026-06-30" },
-      { memberId: "m7", name: "Refilwe Mokoena", payoutDate: "2026-07-31" },
-      { memberId: "m8", name: "Bonga Sithole",   payoutDate: "2026-08-31" }
-    ]
-  }
-};
-
-// The logged-in member's ID — used to highlight their row in the payout list
-// TODO: replace with the real user ID from Dev 2's auth system
-const CURRENT_USER_ID = "m4";
-
-
-// ─── Modal DOM references ─────────────────────────────────────────────────────
-const rulesModal       = document.getElementById("rules-modal");
-const closeModalBtn    = document.getElementById("close-modal-btn");
-const modalAmount      = document.getElementById("modal-amount");
-const modalCycleSummary = document.getElementById("modal-cycle-summary");
-const modalPayoutOrder = document.getElementById("modal-payout-order");
-const modalPenaltySection = document.getElementById("modal-penalty-section");
-const modalPenaltyRules = document.getElementById("modal-penalty-rules");
-
-
-// ─── Modal helper functions ───────────────────────────────────────────────────
-
-// Builds plain-language due date e.g. "Due every month on the 1st"
-function buildCycleSummary(cycleType, dueDayOfMonth) {
-  const suffixes = ["th", "st", "nd", "rd"];
-  const remainder = dueDayOfMonth % 100;
-  // 11, 12, 13 are exceptions — they always use "th"
-  const suffix = (remainder >= 11 && remainder <= 13)
-    ? "th"
-    : suffixes[dueDayOfMonth % 10] || "th";
-  return `Due every ${cycleType.toLowerCase()} on the ${dueDayOfMonth}${suffix}`;
-}
-
-// Opens the modal and populates it with the current group's rules
-function openRulesModal(groupId) {
-  const rules = MOCK_RULES[groupId];
-  if (!rules) return;
-
-  // Contribution amount
-  modalAmount.textContent       = formatCurrency(rules.contributionAmountCents);
-  modalCycleSummary.textContent = buildCycleSummary(rules.cycleType, rules.dueDayOfMonth);
-
-  // Payout order list
+  // Payout order list — from mock until Dev 5 builds the rules endpoint
   modalPayoutOrder.innerHTML = "";
   rules.payoutOrder.forEach((entry, index) => {
     const li = document.createElement("li");
+
+    // Highlight the current user's row in green
+    // entry.memberId is a number, CURRENT_USER_ID is a number — compare directly
     const isCurrentUser = entry.memberId === CURRENT_USER_ID;
     if (isCurrentUser) li.className = "current-user";
 
-    // Position circle
+    // Position circle (1, 2, 3...)
     const position = document.createElement("span");
     position.className   = "payout-position";
     position.textContent = index + 1;
     li.appendChild(position);
 
     // Member name
-    const name = document.createElement("span");
-    name.className   = "payout-member-name";
-    name.textContent = entry.name;
-    li.appendChild(name);
+    const memberName = document.createElement("span");
+    memberName.className   = "payout-member-name";
+    memberName.textContent = entry.name;
+    li.appendChild(memberName);
 
-    // "You" tag for the current user
+    // "You" tag — only on the current user's row
     if (isCurrentUser) {
       const youTag = document.createElement("span");
       youTag.className   = "you-tag";
@@ -425,15 +304,14 @@ function openRulesModal(groupId) {
     modalPayoutOrder.appendChild(li);
   });
 
-  // Penalty rules — hide the section if none were configured by the admin
+  // Hide penalty section if admin did not configure any rules
   if (rules.penaltyRules) {
-    modalPenaltyRules.textContent  = rules.penaltyRules;
-    modalPenaltySection.hidden = false;
+    modalPenaltyRules.textContent = rules.penaltyRules;
+    modalPenaltySection.hidden    = false;
   } else {
     modalPenaltySection.hidden = true;
   }
 
-  // Show the modal
   rulesModal.hidden = false;
 }
 
@@ -443,15 +321,118 @@ function closeRulesModal() {
 }
 
 
-// ─── Modal event listeners ────────────────────────────────────────────────────
+// ─── Main load functions ──────────────────────────────────────────────────────
+
+// We store the full list of groups returned by the API
+// so we can look up the current group when loading its dashboard
+let userGroups = [];
+
+// Finds the group object for a given groupId from the already-fetched list
+// This avoids making a second API call just to get the group details
+function getGroupById(groupId) {
+  return userGroups.find(g => String(g.groupId) === String(groupId));
+}
+
+// Renders the full dashboard for the selected group
+// Uses real API data where available, mock data for what is still missing
+async function loadGroup(groupId) {
+  refreshBtn.textContent = "Loading...";
+  refreshBtn.disabled    = true;
+
+  try {
+    // Get the group from the already-fetched list — no extra API call needed
+    const group = getGroupById(groupId);
+    if (!group) throw new Error("Group not found");
+
+    // Mock cycle and payout — TODO: remove when Dev 5 adds these to the API
+    const { cycle, nextPayout } = getMockCycleAndPayout();
+
+    renderBanner(group.status);
+    renderGroupHeader(group, cycle);   // group from API, cycle from mock
+    renderStats(group);                // all from API
+    renderNextPayout(nextPayout);      // from mock
+    renderMembers(group.members);      // members array from API
+
+  } catch (error) {
+    statusBanner.textContent = "Error: " + error.message;
+    statusBanner.className   = "status-banner closed";
+    statusBanner.hidden      = false;
+
+  } finally {
+    // finally runs whether the fetch succeeded or failed
+    refreshBtn.textContent = "Refresh";
+    refreshBtn.disabled    = false;
+  }
+}
+
+// Fetches rules then opens the modal
+// Passes the current group object so the modal can use real contributionAmount and cycleType
+async function loadAndOpenRules(groupId) {
+  try {
+    const group = getGroupById(groupId);
+    if (!group) throw new Error("Group not found");
+
+    const rules = await fetchRules(groupId);
+    openRulesModal(group, rules); // pass both group (real) and rules (mock)
+  } catch (error) {
+    alert("Could not load rules: " + error.message);
+  }
+}
+
+// Fetches the groups the logged-in user belongs to and populates the dropdown
+// TODO: replace hardcoded userId with real value from Dev 2's auth system
+async function loadUserGroups() {
+  const userId = CURRENT_USER_ID; // using same ID as current user for now
+
+  try {
+    userGroups = await fetchUserGroups(userId);
+
+    // Each item in the array is a flat group object from the API
+    userGroups.forEach(group => {
+      const option       = document.createElement("option");
+      option.value       = group.groupId;  // real API field
+      option.textContent = group.name;     // real API field
+      groupSelect.appendChild(option);
+    });
+
+    // Load the first group by default
+    if (userGroups.length > 0) {
+      loadGroup(String(userGroups[0].groupId));
+    }
+
+  } catch (error) {
+    statusBanner.textContent = "Error loading groups: " + error.message;
+    statusBanner.className   = "status-banner closed";
+    statusBanner.hidden      = false;
+  }
+}
+
+
+// ─── Event listeners ──────────────────────────────────────────────────────────
+
+// When the user picks a different group from the dropdown, load it
+groupSelect.addEventListener("change", () => {
+  loadGroup(groupSelect.value);
+});
+
+// Refresh button re-fetches the group list and reloads the current group
+refreshBtn.addEventListener("click", () => {
+  groupSelect.innerHTML = ""; // clear old options
+  userGroups = [];
+  loadUserGroups();
+});
+
+// "View rules" fetches rules and opens the modal
+viewRulesBtn.addEventListener("click", () => {
+  loadAndOpenRules(groupSelect.value);
+});
 
 // X button closes the modal
 closeModalBtn.addEventListener("click", closeRulesModal);
 
 // Clicking the dark overlay behind the modal also closes it
+// event.target is what was clicked — only close if it was the overlay, not the modal box
 rulesModal.addEventListener("click", (event) => {
-  // event.target is what was actually clicked
-  // we only close if the click was on the overlay itself, not inside the modal box
   if (event.target === rulesModal) closeRulesModal();
 });
 
@@ -460,7 +441,7 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && !rulesModal.hidden) closeRulesModal();
 });
 
-// "View rules" button opens the modal for the currently selected group
-viewRulesBtn.addEventListener("click", () => {
-  openRulesModal(groupSelect.value);
-});
+
+// ─── Initial page load ────────────────────────────────────────────────────────
+// Fetches the real group list from the API then loads the first one
+loadUserGroups();
