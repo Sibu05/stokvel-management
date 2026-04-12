@@ -13,6 +13,7 @@ const configureClient = async()=>{
         authorizationParams: {
             audience: config.audience,
             redirect_uri: window.location.origin,
+            //Requesting profile and email fro auth0
             scope: "openid profile email"
         },
 
@@ -23,6 +24,7 @@ const configureClient = async()=>{
 };
 
 const processLoginState = async()=>{
+    //auth0 redirec
     const query = window.location.search;
     if(query.includes("code=")&&query.includes("state=")){
         await auth0Client.handleRedirectCallback();
@@ -30,6 +32,7 @@ const processLoginState = async()=>{
     }
     const isAuthenticated = await auth0Client.isAuthenticated();
     if(isAuthenticated){
+        //get token and user profile and pass it to the header
         const token = await auth0Client.getTokenSilently();
         const userProfile = await auth0Client.getUser();
 
