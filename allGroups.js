@@ -5,7 +5,7 @@ async function loadAllGroups() {
 
     try {
         // Calling backend endpoint
-        const response = await fetch('/api/groups'); 
+        const response = await fetch('http://localhost:3000/api/groups'); 
         
         if (!response.ok) {
             throw new Error('Network response was not ok');
