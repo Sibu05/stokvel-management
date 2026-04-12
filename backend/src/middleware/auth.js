@@ -51,7 +51,11 @@ function requireAuth(req, res, next) {
     try {
       const user = await prisma.users.upsert({
         where:  { providerId: sub },
-        update: {},
+        update: {
+            // Update the record if we got real data this time
+            name: headerName || undefined,
+            email: headerEmail || undefined
+        },
         create: {
           providerId: sub,
           email:      headerEmail ?? `${sub}@noemail.local`,
