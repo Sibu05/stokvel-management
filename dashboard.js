@@ -55,4 +55,4 @@ document.querySelector('.groups-grid').addEventListener('click', (e) => {
 });
 
 // Run the function when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', loadAllGroups);
+document.addEventListener('DOMContentLoaded', loadMyGroups);
