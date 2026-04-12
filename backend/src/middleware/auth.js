@@ -17,7 +17,7 @@ function requireAuth(req, res, next) {
     const { sub, email, name } = req.auth.payload;
 
     try {
-      const user = await prisma.user.upsert({
+      const user = await prisma.users.upsert({
         where:  { providerId: sub },
         update: {},
         create: {

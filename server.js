@@ -1,6 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-require('dotenv').config(); 
+require('dotenv').
+config(); 
 
 
 const crypto = require('crypto');
@@ -15,6 +16,16 @@ app.use(express.static('.'));
 function generateUniqueToken() {
   return crypto.randomBytes(32).toString('hex');
 }
+
+const { requireAuth } = require('./backend/src/middleware/auth');
+
+app.get('/api/auth/me', requireAuth, (req, res) => {
+  res.json({
+    userId: req.user.id,
+    name: req.user.name,
+    email: req.user.email
+  });
+});
 
 
 // This is the endpoint for registering a new user. It will be used by dev1 and dev2 to create new users in the database when they log in with Google for the first time. The providerId is the unique identifier from Google, and it will be used to check if the user already exists in the database. If the user already exists, we can skip creating a new user and just return the existing user data.
