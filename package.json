@@ -4,8 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "build": "prisma generate"
+    "start": "node server.js"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
