@@ -12,8 +12,10 @@ const configureClient = async()=>{
         clientId: config.clientId,
         authorizationParams: {
             audience: config.audience,
-            redirect_uri: window.location.origin
+            redirect_uri: window.location.origin,
+            scope: "openid profile email"
         },
+
         //Stay logged in after refreshing.
         useRefreshTokens: true,  
         cacheLocation: 'localstorage'
@@ -29,10 +31,13 @@ const processLoginState = async()=>{
     const isAuthenticated = await auth0Client.isAuthenticated();
     if(isAuthenticated){
         const token = await auth0Client.getTokenSilently();
+        const userProfile = await auth0Client.getUser();
 
         const response = await fetch('http://localhost:3000/api/auth/me', {
             headers: {
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token}`,
+                'x-user-name': userProfile.name,
+                'x-user-email': userProfile.email
             }
         });
 
