@@ -1,10 +1,8 @@
 // Function to fetch all groups from the backend
 async function loadAllGroups() {
     const grid = document.querySelector('.groups-grid');
-    const noGroupsMessage = document.getElementById('noGroups');
+    //const noGroupsMessage = document.getElementById('noGroups');
 
-    noGroupsMessage.hidden = true; 
-    grid.hidden = true;
 
     try {
         // Calling backend endpoint
@@ -18,7 +16,7 @@ async function loadAllGroups() {
 
         //Check if there is data
         if (groups.length === 0) {
-            noGroupsMessage.hidden = false;
+            //noGroupsMessage.hidden = false;
             grid.hidden = true;
             return;
         }
@@ -26,7 +24,7 @@ async function loadAllGroups() {
         // Clear the grid and show it
         grid.innerHTML = ''; 
         grid.hidden = false;
-        noGroupsMessage.hidden = true;
+        //noGroupsMessage.hidden = true;
 
         //inject HTML in each group
         groups.forEach(group => {
