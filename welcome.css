@@ -1,0 +1,76 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    height: 100vh;
+    background-color:rgb(178, 178, 178);
+}
+
+.center {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    border: 1px solid rgb(167, 162, 162);
+   height: 500px;
+    width: 1000px;
+    background-color: rgb(220, 220, 220);
+}
+h1{
+    color:rgb(41, 41, 41);
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+h2{
+    margin-left: 20px;
+    color:rgb(36, 36, 36);
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.half-welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    gap:15px;
+    flex : 1;
+    background-color:rgb(221, 222, 222); 
+}
+#signUp{
+    color:rgb(49, 42, 52);
+    font-weight: bold;
+}
+.buttons{
+    display: flex;
+    flex-direction: row;
+    gap:8px;
+}
+
+#btnGoogle{
+    height: 38px;
+    width:120px;
+    background-color:rgb(92, 92, 92);
+    border-radius: 10px;
+}
+#btnApple{
+    height: 38px;
+    width:120px;
+    background-color:rgb(92, 92, 92);
+    border-radius: 10px;
+}
+
+#btnGoogle:hover{
+    background-color:rgb(68, 68, 68);
+}
+#btnApple:hover{
+    background-color:rgb(68, 68, 68);
+}
+.purpose{
+    border: 1px solid;
+    border-radius: 10px;
+    border-color: rgb(79, 78, 78);
+    font-style: italic;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    padding: 0 10px;
+    margin: 15px;   
+}
+#extra{
+    margin: 150px;
+}
