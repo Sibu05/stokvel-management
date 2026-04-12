@@ -51,8 +51,8 @@ if (btnMy) {
 }
 
 const btnCreate = document.getElementById("buttonCreateGroup");
-/*if (btnCreate) {
-    btnCreate.onclick = () => window.location.href = ;
-}*/
+if (btnCreate) {
+    btnCreate.onclick = () => window.location.href = "pages/create-group.html";
+}
 // Run the function when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', loadAllGroups);
