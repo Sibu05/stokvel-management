@@ -1,0 +1,687 @@
+/* =============================================
+   main.css — Stokvel App shared styles
+   ============================================= */
+
+:root {
+  --cyan:       #00bcd4;
+  --cyan-dark:  #0097a7;
+  --cyan-light: #e0f7fa;
+  --black:      #111;
+  --grey:       #6b7280;
+  --light-grey: #f3f4f6;
+  --border:     #e5e7eb;
+  --white:      #ffffff;
+  --red:        #ef4444;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f8fafc;
+  color: #111;
+}
+
+/* --- Nav bar --- */
+nav {
+  background: var(--black);
+  padding: 0 32px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo {
+  color: var(--cyan);
+  font-weight: bold;
+  font-size: 16px;
+  letter-spacing: 2px;
+}
+
+.nav-page-name {
+  color: #888;
+  font-size: 13px;
+}
+
+/* --- Page wrapper --- */
+.page {
+  max-width: 660px;
+  margin: 0 auto;
+  padding: 36px 20px;
+}
+
+.page h1 {
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.page p.subtitle {
+  color: var(--grey);
+  font-size: 14px;
+  margin-bottom: 28px;
+}
+
+/* --- Card --- */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 24px;
+}
+
+/* --- Progress bar (ol > li — semantic ordered list) --- */
+ol.progress-bar {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 28px;
+  list-style: none;
+  padding: 0;
+}
+
+ol.progress-bar li.step-pill {
+  flex: 1;
+  text-align: center;
+  padding: 9px 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--grey);
+  background: #fafafa;
+  border-right: 1px solid var(--border);
+}
+
+ol.progress-bar li.step-pill:last-child {
+  border-right: none;
+}
+
+ol.progress-bar li.step-pill.active {
+  background: var(--black);
+  color: var(--cyan);
+  font-weight: bold;
+}
+
+ol.progress-bar li.step-pill.done {
+  background: var(--cyan-light);
+  color: var(--cyan-dark);
+}
+
+/* --- section = each wizard step (hidden attribute hides it) --- */
+section[hidden] {
+  display: none;
+}
+
+/* --- fieldset strips its default border --- */
+fieldset {
+  border: none;
+  padding: 0;
+  margin: 0 0 8px 0;
+}
+
+legend {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--grey);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 16px;
+}
+
+/* --- aside = drag placeholder area in Step 3 --- */
+aside#drag-area {
+  margin-top: 12px;
+}
+
+/* --- Form fields --- */
+.field {
+  margin-bottom: 18px;
+}
+
+.field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #374151;
+}
+
+.field label .req {
+  color: var(--red);
+  margin-left: 2px;
+}
+
+.field label .hint {
+  font-weight: normal;
+  color: var(--grey);
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  outline: none;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--cyan);
+}
+
+.field input.error-border {
+  border-color: var(--red);
+}
+
+/* --- Inline error text --- */
+.error-msg {
+  display: none;
+  color: var(--red);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.error-msg.show {
+  display: block;
+}
+
+/* --- Character counter --- */
+.char-count {
+  text-align: right;
+  font-size: 11px;
+  color: var(--grey);
+  margin-top: 3px;
+}
+
+/* --- Radio pills (Monthly / Weekly etc.) --- */
+.radio-group {
+  display: flex;
+  gap: 10px;
+}
+
+.radio-pill {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--grey);
+  cursor: pointer;
+}
+
+.radio-pill.selected {
+  border-color: var(--cyan);
+  background: var(--cyan-light);
+  color: var(--cyan-dark);
+}
+
+/* --- Buttons --- */
+.btn-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.btn {
+  padding: 10px 22px;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1.5px solid var(--black);
+  background: var(--black);
+  color: white;
+  font-weight: 600;
+}
+
+.btn:hover {
+  background: #333;
+}
+
+.btn.outline {
+  background: white;
+  color: var(--black);
+}
+
+.btn.outline:hover {
+  background: var(--light-grey);
+}
+
+.btn.cyan {
+  background: var(--cyan);
+  border-color: var(--cyan);
+  color: var(--black);
+}
+
+.btn.cyan:hover {
+  background: var(--cyan-dark);
+  border-color: var(--cyan-dark);
+}
+
+/* --- Review summary box (Step 4) --- */
+.review-box {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.review-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.review-row:last-child {
+  border-bottom: none;
+}
+
+.review-row .label {
+  color: var(--grey);
+}
+
+.review-row .value {
+  font-weight: 600;
+}
+
+/* --- Drag placeholder (Step 3) --- */
+.drag-placeholder-box {
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--grey);
+}
+
+
+/* =============================================
+   Settings page styles
+   ============================================= */
+
+/* --- Unsaved changes bar --- */
+aside.save-bar {
+  background: var(--black);
+  color: white;
+  border-radius: 8px;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+aside.save-bar[hidden] {
+  display: none;
+}
+
+.save-bar-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* --- Tab navigation --- */
+nav.tab-nav {
+  display: flex;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 24px;
+  gap: 0;
+}
+
+button.tab {
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: Arial, sans-serif;
+  color: var(--grey);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+}
+
+button.tab:hover {
+  color: var(--black);
+}
+
+button.tab.active {
+  color: var(--cyan-dark);
+  border-bottom-color: var(--cyan);
+}
+
+/* --- Read-only field --- */
+output.readonly-field {
+  display: block;
+  padding: 10px 12px;
+  background: var(--light-grey);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--grey);
+}
+
+/* --- Field note (small helper text) --- */
+.field-note {
+  font-size: 12px;
+  color: var(--grey);
+  margin-bottom: 14px;
+}
+
+/* --- Danger zone --- */
+section.danger-zone {
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 18px;
+  background: #fff9f9;
+  margin-top: 28px;
+}
+
+section.danger-zone h2 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--red);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 6px;
+}
+
+section.danger-zone p {
+  font-size: 13px;
+  color: var(--grey);
+  margin-bottom: 14px;
+}
+
+/* --- Empty tab message --- */
+.empty-tab-msg {
+  font-size: 14px;
+  color: var(--grey);
+  text-align: center;
+  padding: 40px 0;
+}
+
+/* --- <dialog> modal --- */
+dialog {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 28px;
+  max-width: 380px;
+  width: 90%;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+}
+
+dialog h2 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+dialog p {
+  font-size: 13px;
+  color: var(--grey);
+  margin-bottom: 18px;
+}
+
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+
+/* =============================================
+   Nav links (ul inside nav)
+   ============================================= */
+nav ul.nav-links {
+  display: flex;
+  gap: 4px;
+  list-style: none;
+  margin-left: auto;
+  padding: 0;
+}
+
+button.nav-btn {
+  background: none;
+  border: 1px solid transparent;
+  color: #888;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+}
+
+button.nav-btn:hover {
+  color: white;
+}
+
+button.nav-btn.active {
+  color: var(--cyan);
+  border-color: #1e3a3f;
+  background: #0a1f22;
+}
+
+/* =============================================
+   Screens — hidden/shown by app.js
+   ============================================= */
+section.screen[hidden] {
+  display: none;
+}
+
+/* =============================================
+   Invites page
+   ============================================= */
+
+/* Copy link row */
+.copy-link-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-top: 16px;
+  font-size: 13px;
+}
+
+.link-url {
+  flex: 1;
+  color: var(--grey);
+  font-family: monospace;
+  font-size: 12px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.copied-msg {
+  font-size: 12px;
+  color: var(--cyan-dark);
+  font-weight: 600;
+}
+
+.copied-msg[hidden] {
+  display: none;
+}
+
+/* Card title */
+h2.card-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--grey);
+  margin-bottom: 16px;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 32px;
+  color: var(--grey);
+  font-size: 14px;
+}
+
+/* Invite table */
+table.invite-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+table.invite-table th,
+table.invite-table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+table.invite-table th {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--grey);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+table.invite-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Status badges */
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.badge.pending  { background: #fef3c7; color: #92400e; }
+.badge.accepted { background: #dcfce7; color: #166534; }
+.badge.declined { background: #fee2e2; color: #991b1b; }
+.badge.expired  { background: #f3f4f6; color: #6b7280; }
+.badge.revoked  { background: #f3f4f6; color: #6b7280; }
+
+/* Drag list in Step 3 */
+ul.drag-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 8px;
+}
+
+li.drag-item {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  cursor: grab;
+}
+
+.drag-handle {
+  color: #ccc;
+}
+
+.drag-label {
+  font-size: 13px;
+  color: var(--grey);
+  margin-bottom: 8px;
+}
+
+
+/* Loading message */
+.loading-msg {
+  color: #6b7280;
+  font-size: 14px;
+  padding: 40px 0;
+  text-align: center;
+}
+
+/* Screen reader only (hidden visually but readable by assistive tech) */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  border: 0;
+}
+
+/* Review intro text */
+.review-intro {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 14px;
+}
+/* ===== NAVBAR for index===== */
+nav {
+  background: #0a0a0a;
+  height: 60px;
+  padding: 0 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Logo */
+.logo {
+  color: #00bcd4;
+  font-weight: bold;
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+
+/* Nav links container */
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+/* Remove default list styling */
+.nav-links li {
+  display: inline;
+}
+
+/* Nav buttons (links) */
+.nav-btn {
+  text-decoration: none;
+  color: #aaa;
+  font-size: 14px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+/* Hover effect */
+.nav-btn:hover {
+  background: #1f2937;
+  color: #00bcd4;
+}
+
+/* Active page */
+.nav-btn.active {
+  background: #00bcd4;
+  color: black;
+  font-weight: 600;
+}
