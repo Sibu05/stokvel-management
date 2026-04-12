@@ -3,6 +3,9 @@ async function loadAllGroups() {
     const grid = document.querySelector('.groups-grid');
     const noGroupsMessage = document.getElementById('noGroups');
 
+    noGroupsMessage.hidden = true; 
+    grid.hidden = true;
+
     try {
         // Calling backend endpoint
         const response = await fetch('http://localhost:3000/api/groups'); 
