@@ -10,7 +10,7 @@ const verifyToken = auth({
 });
 
 // Verifies JWT + upserts user in DB
-function requireAuth(req, res, next) {
+/*function requireAuth(req, res, next) {
   verifyToken(req, res, async (err) => {
     if (err) return next(err);
 
@@ -26,6 +26,36 @@ function requireAuth(req, res, next) {
           providerId: sub,
           email:      email ?? `${sub}@noemail.local`,
           name:       name  ?? 'Stokvel User',
+        },
+      });
+
+      req.user = user;
+      next();
+    } catch (err) {
+      console.error('DB error:', err.message);
+      res.status(500).json({ error: 'Database error' });
+    }
+  });
+}*/
+
+function requireAuth(req, res, next) {
+  verifyToken(req, res, async (err) => {
+    if (err) return next(err);
+
+    const { sub } = req.auth.payload;
+    
+    // Read the info sent from frontend
+    const headerName = req.headers['x-user-name'];
+    const headerEmail = req.headers['x-user-email'];
+
+    try {
+      const user = await prisma.users.upsert({
+        where:  { providerId: sub },
+        update: {},
+        create: {
+          providerId: sub,
+          email:      headerEmail ?? `${sub}@noemail.local`,
+          name:       headerName  ?? 'Stokvel User',
         },
       });
 
