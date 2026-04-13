@@ -10,7 +10,25 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "test": "jest --coverage",
+    "postinstall": "prisma generate"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "server.js",
+      "routes/*.js",
+      "controllers/*.js"
+    ],
+
+      "coverageThreshold": {
+      "global": {
+        "branches": 70,
+        "functions": 70,
+        "lines": 70,
+        "statements": 70
+      }
+    }
   },
   "repository": {
     "type": "git",
@@ -22,5 +40,8 @@
   "bugs": {
     "url": "https://github.com/Cyberbot56/stokvel-management/issues"
   },
-  "homepage": "https://github.com/Cyberbot56/stokvel-management#readme"
+  "homepage": "https://github.com/Cyberbot56/stokvel-management#readme",
+  "devDependencies": {
+    "jest": "^30.3.0"
+  }
 }
