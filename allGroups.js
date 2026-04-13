@@ -11,7 +11,14 @@ const setAvatar = () => {
     if (avatar) avatar.textContent = initials || '?';
 };
 
-// Store both lists once fetched
+const setWelcome = () => {
+    const name = localStorage.getItem('userName') || '';
+    const firstName = name.split(' ')[0] || 'there';
+    const greeting = document.getElementById('welcomeGreeting');
+    if (greeting) greeting.textContent = `Welcome back, ${firstName}!`;
+};
+
+// Store both lists once fetched so toggling doesn't re-fetch
 let allGroupsCache = [];
 let myGroupsCache = [];
 let currentView = 'all'; // 'all' or 'mine'
@@ -148,5 +155,6 @@ if (btnCreate) {
 
 function onAuthReady() {
     setAvatar();
+    setWelcome();
     loadAllGroups();
 }

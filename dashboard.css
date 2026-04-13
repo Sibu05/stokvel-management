@@ -10,6 +10,7 @@ body {
     color: #0f172a;
 }
 
+/* ── Header ── */
 header {
     background: linear-gradient(120deg, #a8ede8 0%, #3cc8c0 35%, #0e9490 70%, #034e52 100%);
     padding: 0 2rem;
@@ -73,15 +74,92 @@ header h1 {
     font-weight: 700;
 }
 
-/* ── Actions ── */
-.actions {
+
+/* ── Welcome banner ── */
+.welcome-banner {
+    background: white;
+    border-bottom: 1px solid rgba(14, 148, 144, 0.1);
+    padding: 1.25rem 2rem;
     display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    padding: 1.5rem 2rem 0.5rem;
+    align-items: center;
+    justify-content: space-between;
 }
 
-button {
+.welcome-greeting {
+    font-size: 18px;
+    font-weight: 800;
+    color: #034e52;
+    margin-bottom: 3px;
+}
+
+.welcome-sub {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 400;
+}
+
+/* ── Actions bar ── */
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 1.5rem 2rem 0.75rem;
+}
+
+/* Toggle group — All Groups + My Groups sit in a pill container */
+.toggle-group {
+    display: flex;
+    background: white;
+    border: 1.5px solid rgba(14, 148, 144, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(14, 148, 144, 0.08);
+}
+
+.toggle-group button {
+    border-radius: 0;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 0.55rem 1.1rem;
+    gap: 6px;
+    transition: background 0.15s ease, color 0.15s ease;
+    box-shadow: none;
+}
+
+.toggle-group button:first-child {
+    border-right: 1px solid rgba(14, 148, 144, 0.15);
+}
+
+.toggle-group button svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+.toggle-group button:hover {
+    background: #f0fafa;
+    color: #0e9490;
+    transform: none;
+}
+
+.toggle-group button.active {
+    background: linear-gradient(135deg, #2dd4bf 0%, #0e9490 100%);
+    color: white;
+}
+
+.toggle-group button.active svg {
+    stroke: white;
+}
+
+/* Create Group pushed to the right */
+.actions-right {
+    margin-left: auto;
+}
+
+#buttonCreateGroup {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -92,31 +170,16 @@ button {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     cursor: pointer;
     border: none;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-}
-
-button svg {
-    width: 14px;
-    height: 14px;
-    flex-shrink: 0;
-}
-
-#buttonMyGroups {
-    background: white;
-    color: #0e9490;
-    border: 1.5px solid #2dd4bf;
-    box-shadow: none;
-}
-
-#buttonMyGroups:hover {
-    background: #e0f7f6;
-    transform: translateY(-1px);
-}
-
-#buttonCreateGroup {
     background: linear-gradient(135deg, #2dd4bf 0%, #0e9490 100%);
     color: white;
     box-shadow: 0 2px 8px rgba(14, 148, 144, 0.3);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+#buttonCreateGroup svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
 }
 
 #buttonCreateGroup:hover {
@@ -127,15 +190,16 @@ button svg {
 
 /* ── Main ── */
 main {
-    padding: 0.5rem 2rem 2rem;
+    padding: 0.25rem 2rem 2rem;
 }
 
-/* ── Empty state ── */
-#noGroups {
+/* ── Empty / error states ── */
+#noGroups,
+.state-message {
     display: block;
     text-align: center;
     margin: 4rem auto;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-style: italic;
     color: #64748b;
 }
@@ -232,14 +296,21 @@ main {
 
 .btnViewGroup {
     width: 100%;
+    display: flex;
     justify-content: center;
+    align-items: center;
     margin-top: 4px;
     padding: 8px;
     background: #f0fafa;
     color: #0e9490;
     border: 1.5px solid rgba(14, 148, 144, 0.25);
+    border-radius: 8px;
     font-size: 12px;
+    font-weight: 600;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    cursor: pointer;
     box-shadow: none;
+    transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .btnViewGroup:hover {
