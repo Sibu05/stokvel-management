@@ -11,7 +11,7 @@ const setAvatar = () => {
     if (avatar) avatar.textContent = initials || '?';
 };
 
-// Store both lists once fetched so toggling doesn't re-fetch
+// Store both lists once fetched
 let allGroupsCache = [];
 let myGroupsCache = [];
 let currentView = 'all'; // 'all' or 'mine'

@@ -24,8 +24,6 @@ async function loadMyGroups() {
     }
 
     try {
-        // FIXED: use config.apiBase instead of hardcoded localhost
-        // FIXED: send auth token with request
         const token = await auth0Client.getTokenSilently();
 
         const response = await fetch(`${config.apiBase}/api/groups_members/${userId}`, {
@@ -87,7 +85,6 @@ async function loadMyGroups() {
     }
 }
 
-// FIXED: button ID matches what's in my-groups.html
 const btnAll = document.getElementById('buttonViewAllGroups');
 if (btnAll) {
     btnAll.onclick = () => window.location.href = '../dashboard.html';

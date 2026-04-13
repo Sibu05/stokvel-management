@@ -10,7 +10,6 @@ body {
     color: #0f172a;
 }
 
-/* ── Header ── */
 header {
     background: linear-gradient(120deg, #a8ede8 0%, #3cc8c0 35%, #0e9490 70%, #034e52 100%);
     padding: 0 2rem;

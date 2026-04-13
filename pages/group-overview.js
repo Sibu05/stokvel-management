@@ -129,7 +129,7 @@ const modalPenaltySection = document.getElementById("modal-penalty-section");
 const modalPenaltyRules   = document.getElementById("modal-penalty-rules");
 
 
-// ─── Render functions ─────────────────────────────────────────────────────────
+// Render functions
 
 function renderBanner(status) {
   if (status === "active") {
@@ -242,8 +242,6 @@ function closeRulesModal() {
 }
 
 
-// ─── Main load functions ──────────────────────────────────────────────────────
-
 let userGroups = [];
 
 function getGroupById(groupId) {
@@ -288,8 +286,6 @@ async function loadAndOpenRules(groupId) {
   }
 }
 
-// FIXED: reads groupId from URL params instead of localStorage
-// FIXED: uses real userId from localStorage instead of hardcoded CURRENT_USER_ID = 1
 async function loadUserGroups() {
   const userId = localStorage.getItem('userId');
 
@@ -300,7 +296,6 @@ async function loadUserGroups() {
     return;
   }
 
-  // FIXED: read groupId from URL query param e.g. ?groupId=5
   const urlParams = new URLSearchParams(window.location.search);
   const selectedGroupId = urlParams.get('groupId');
 
@@ -329,7 +324,7 @@ async function loadUserGroups() {
 }
 
 
-// ─── Event listeners ──────────────────────────────────────────────────────────
+// Event listeners
 
 groupSelect.addEventListener("change", () => {
   loadGroup(groupSelect.value);

@@ -1,12 +1,3 @@
-// =============================================
-// invites.js — Invite management logic
-// =============================================
-
-// Populate the group name subtitle from appState
-// =============================================
-// invites.js — Invite management logic
-// =============================================
-
 // Use default group ID 1
 const DEFAULT_GROUP_ID = 1;
 

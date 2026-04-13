@@ -276,7 +276,6 @@ progress::-moz-progress-bar      { background: #0e9490; border-radius: 99px; }
   color: #034e52;
 }
 
-/* ── Next payout card ── */
 .payout-row {
   display: flex;
   align-items: center;

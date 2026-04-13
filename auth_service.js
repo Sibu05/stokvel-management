@@ -1,4 +1,4 @@
-// config is loaded from config.js — do not redeclare it here.
+
 let auth0Client = null;
 
 const configureClient = async () => {
@@ -98,7 +98,6 @@ window.onload = async () => {
             };
         }
 
-        // FIXED: after auth is ready, call onAuthReady() if the page has defined it.
         // This allows page scripts like group-overview.js, allGroups.js, dashboard.js
         // to wait for auth0Client to be fully initialised before running.
         if (typeof onAuthReady === "function") {

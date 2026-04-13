@@ -32,7 +32,6 @@ model group_invites {
   groups         groups   @relation(fields: [SFKgroupId], references: [groupId], onUpdate: NoAction, map: "SFKgroupId")
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model group_members {
   group_memberId Int      @id(map: "PK_group_members") @default(autoincrement())
   FgroupId       Int

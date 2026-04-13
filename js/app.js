@@ -1,7 +1,3 @@
-// =============================================
-// app.js — Page loader and shared state
-// =============================================
-
 // Shared data that any page can read or write.
 // When Create Group saves a group, it goes here.
 // Settings can then read it.
@@ -14,8 +10,6 @@ var appState = {
   payoutOrder:  ''
 };
 
-
-// ── Load a page into the main area ──────────
 // Fetches the HTML file from the pages/ folder
 // and puts it inside <main id="app-content">
 function loadPage(pageName) {
