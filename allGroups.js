@@ -17,11 +17,12 @@ async function loadAllGroups() {
     const loadError = document.getElementById('loadError');
 
     try {
-        // FIXED: use auth0Client.getTokenSilently() — token was never stored
-        // in localStorage under 'token', so localStorage.getItem('token') always returned null
         const token = await auth0Client.getTokenSilently();
+        const userId = localStorage.getItem('userId');
 
-        const response = await fetch(`${config.apiBase}/api/groups`, {
+        // FIXED: use /api/groups_members/:userId instead of /api/groups
+        // so that userRole is included in each group object for admin routing
+        const response = await fetch(`${config.apiBase}/api/groups_members/${userId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -63,7 +64,6 @@ async function loadAllGroups() {
             `;
 
             card.querySelector('.btnViewGroup').addEventListener('click', () => {
-                // Route admins to the admin page, members to the regular overview
                 const dest = group.userRole === 'admin' ? 'group-admin.html' : 'group-overview.html';
                 window.location.href = `pages/${dest}?groupId=${group.groupId}`;
             });
@@ -78,7 +78,6 @@ async function loadAllGroups() {
     }
 }
 
-// FIXED: My Groups navigates to pages/my-groups.html
 const btnMy = document.getElementById('buttonMyGroups');
 if (btnMy) {
     btnMy.onclick = () => window.location.href = 'pages/my-groups.html';
@@ -89,7 +88,6 @@ if (btnCreate) {
     btnCreate.onclick = () => window.location.href = 'pages/create-group.html';
 }
 
-// onAuthReady is called by auth_service.js once auth0Client is fully initialised
 function onAuthReady() {
     setAvatar();
     loadAllGroups();
