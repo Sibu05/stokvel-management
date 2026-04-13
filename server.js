@@ -11,7 +11,11 @@ const path = require('path');
 const app = express();
 
 app.use(cors({
-    origin: ["http://localhost:5500", "http://localhost:5173"] 
+    origin: [
+        "http://localhost:5500",
+        "http://localhost:5173",
+        process.env.FRONTEND_URL
+    ].filter(Boolean)
 }));
 
 app.use(express.json());
@@ -27,8 +31,7 @@ app.get('/api/auth/me', requireAuth, (req, res) => {
   res.json({
     userId: req.user.userId,
     name: req.user.name,
-    email: req.user.email,
-    rawTokenPayload: req.auth.payload
+    email: req.user.email
   });
 });
 
@@ -214,6 +217,71 @@ app.get('/api/groups_members/:userId', async (req, res) => {
   }
 });
 
+
+
+app.post('/api/groups/add-member', async (req, res) => {
+  const { email, groupId } = req.body;
+
+  if (!email || !groupId) {
+    return res.status(400).json({ 
+      error: "Missing required fields",
+      required: ["email", "groupId"]
+    });
+  }
+
+  try {
+    const user = await prisma.users.findUnique({
+      where: { email: email }
+    });
+
+    if (!user) {
+      return res.status(404).json({ 
+        error: "User not found. Please ask the user to create an account first." 
+      });
+    }
+
+    const existingMembership = await prisma.group_members.findFirst({
+      where: {
+        FgroupId: parseInt(groupId),
+        SuserId: user.userId
+      }
+    });
+
+    if (existingMembership) {
+      return res.status(400).json({ 
+        error: "User is already a member of the group"
+      });
+    }
+
+    const newMember = await prisma.group_members.create({
+      data: {
+        FgroupId: parseInt(groupId),
+        SuserId: user.userId,
+        role: "member",
+        joinedAt: new Date()
+      }
+    });
+
+    const group = await prisma.groups.findUnique({
+      where: { groupId: parseInt(groupId) },
+      select: { name: true }
+    });
+
+    res.status(201).json({ 
+      message: "Member added successfully",
+      member: {
+        groupName: group?.name,
+        userEmail: user.email,
+        userName: user.name,
+        role: newMember.role,
+        joinedAt: newMember.joinedAt
+      }
+    });
+  } catch (error) {
+    console.error("Error adding member to group:", error);
+    res.status(500).json({ error: "Failed to add member to group", details: error.message });
+  }
+});
 
 //This is for invites, I'm generating a rondom unique token to use for sending invites to users.
 //creating a new invite using post.
