@@ -40,15 +40,13 @@ model group_members {
   joinedAt       DateTime @db.Date
   groups         groups   @relation(fields: [FgroupId], references: [groupId], onUpdate: NoAction, map: "FgroupId")
   users          users    @relation(fields: [SuserId], references: [userId], onUpdate: NoAction, map: "SuserId")
-
-  
 }
 
 model groups {
   groupId            Int               @id(map: "PK_groups") @default(autoincrement())
   name               String            @db.VarChar(50)
   description        String?           @db.Text
-  contributionAmount Int
+  contributionAmount Decimal           @db.Decimal(10, 2)
   cycleType          String            @db.VarChar(15)
   payoutOrder        String            @db.VarChar(50)
   startDate          DateTime          @db.Date
