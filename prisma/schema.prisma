@@ -15,8 +15,8 @@ model group_audit_log {
   newValue          String?  @db.Text
   changedAt         DateTime @db.Date
   changedBy         Int
-  users             users    @relation(fields: [changedBy], references: [userId], onUpdate: NoAction, map: "changedBy")
-  groups            groups   @relation(fields: [TFKgroupId], references: [groupId], onUpdate: NoAction, map: "TFKgroupId")
+  users             users    @relation(fields: [changedBy], references: [userId], onUpdate: NoAction, onDelete: NoAction, map: "changedBy")
+  groups            groups   @relation(fields: [TFKgroupId], references: [groupId], onUpdate: NoAction, onDelete: NoAction, map: "TFKgroupId")
 }
 
 model group_invites {
@@ -28,8 +28,8 @@ model group_invites {
   createdAt      DateTime @db.Date
   expiresAt      DateTime @db.Date
   status         String   @db.VarChar(10)
-  users          users    @relation(fields: [createdBy], references: [userId], onUpdate: NoAction, map: "createdBy")
-  groups         groups   @relation(fields: [SFKgroupId], references: [groupId], onUpdate: NoAction, map: "SFKgroupId")
+  users          users    @relation(fields: [createdBy], references: [userId], onUpdate: NoAction, onDelete: NoAction, map: "createdBy")
+  groups         groups   @relation(fields: [SFKgroupId], references: [groupId], onUpdate: NoAction, onDelete: NoAction, map: "SFKgroupId")
 }
 
 model group_members {
@@ -38,10 +38,8 @@ model group_members {
   SuserId        Int
   role           String   @db.VarChar(10)
   joinedAt       DateTime @db.Date
-  groups         groups   @relation(fields: [FgroupId], references: [groupId], onUpdate: NoAction, map: "FgroupId")
-  users          users    @relation(fields: [SuserId], references: [userId], onUpdate: NoAction, map: "SuserId")
-
-  
+  groups         groups   @relation(fields: [FgroupId], references: [groupId], onUpdate: NoAction, onDelete: NoAction, map: "FgroupId")
+  users          users    @relation(fields: [SuserId], references: [userId], onUpdate: NoAction, onDelete: NoAction, map: "SuserId")
 }
 
 model groups {
@@ -58,17 +56,61 @@ model groups {
   group_audit_log    group_audit_log[]
   group_invites      group_invites[]
   group_members      group_members[]
-  users              users             @relation(fields: [FiuserId], references: [userId], onUpdate: NoAction, map: "FiuserId")
+  payouts            Payout[]
+  contributions      contributions[]
+  users              users             @relation(fields: [FiuserId], references: [userId], onUpdate: NoAction, onDelete: NoAction, map: "FiuserId")
 }
 
 model users {
-  userId          Int               @id(map: "Id") @default(autoincrement())
-  providerId      String            @unique(map: "User_providerId_key")
-  email           String            @unique(map: "User_email_key")
-  name            String
-  createdAt       DateTime          @default(now(), map: "User_createdAt_df") @db.Date
-  group_audit_log group_audit_log[]
-  group_invites   group_invites[]
-  group_members   group_members[]
-  groups          groups[]
+  userId                Int               @id(map: "Id") @default(autoincrement())
+  providerId            String            @unique(map: "User_providerId_key")
+  email                 String            @unique(map: "User_email_key")
+  name                  String
+  createdAt             DateTime          @default(now(), map: "User_createdAt_df") @db.Date
+  group_audit_log       group_audit_log[]
+  group_invites         group_invites[]
+  group_members         group_members[]
+  groups                groups[]
+  
+  // Relations - Strings in @relation() must match the other side exactly
+  contributions         contributions[]   @relation("Contributor")
+  approvedContributions contributions[]   @relation("Treasurer")
+  payoutsReceived       Payout[]          @relation("recipientPayouts")
+  payoutsInitiated      Payout[]          @relation("initiatorPayouts")
+}
+
+model contributions {
+  contributionsId Int      @id(map: "PK_contributions") @default(autoincrement())
+  groupId         Int
+  userId          Int
+  treasurerId     Int
+  amount          Decimal  @db.Decimal(10, 2)
+  dueDate         DateTime
+  paidAt          DateTime? 
+  status          String   @default("pending") @db.VarChar(15)
+
+  // Relations
+  group     groups @relation(fields: [groupId], references: [groupId], onUpdate: NoAction, onDelete: NoAction, map: "FK_contributions_groups")
+  user      users  @relation("Contributor", fields: [userId], references: [userId], onUpdate: NoAction, onDelete: NoAction, map: "FK_contributions_user")
+  treasurer users  @relation("Treasurer", fields: [treasurerId], references: [userId], onUpdate: NoAction, onDelete: NoAction, map: "FK_contributions_treasurer")
+}
+
+model Payout {
+  payoutId       Int       @id @default(autoincrement())
+  groupId        Int       @map("FKgroupId")
+  amount         Float
+  recipientId    Int       @map("FKrecipientId")
+  recipientName  String
+  status         String    @default("pending")
+  initiatedBy    Int       @map("FKinitiatedBy")
+  initiatedAt    DateTime  @default(now())
+  processedAt    DateTime?
+  transactionRef String?
+  notes          String?
+
+  group     groups @relation(fields: [groupId], references: [groupId], onUpdate: NoAction, onDelete: NoAction)
+  recipient users  @relation("recipientPayouts", fields: [recipientId], references: [userId], onUpdate: NoAction, onDelete: NoAction)
+  initiator users  @relation("initiatorPayouts", fields: [initiatedBy], references: [userId], onUpdate: NoAction, onDelete: NoAction)
+
+  @@map("payouts")
 }
