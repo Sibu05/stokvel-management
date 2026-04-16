@@ -25,25 +25,17 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
 
-      - name: Install backend dependencies
-        run: |
-          cd backend
-          npm ci
+      - name: Install dependencies
+        run: npm ci
 
       - name: Run Prisma validation
-        run: |
-          # Don't cd into backend, stay in root where prisma folder exists
-          npx prisma validate --schema=prisma/schema.prisma
+        run: npx prisma validate --schema=prisma/schema.prisma
 
       - name: Generate Prisma client
-        run: |
-          cd backend
-          npx prisma generate
+        run: npx prisma generate --schema=prisma/schema.prisma
 
       - name: Security audit
-        run: |
-          cd backend
-          npm audit --production --audit-level=moderate || echo "Security issues found but continuing"
+        run: npm audit --production --audit-level=moderate || echo "Security issues found but continuing"
 
   # Job 2: Build check for frontend
   build-frontend:
@@ -60,7 +52,6 @@ jobs:
 
       - name: Check static files
         run: |
-          # Verify critical files exist
           test -f frontend/pages/index.html && echo "✅ index.html exists"
           test -f frontend/pages/dashboard.html && echo "✅ dashboard.html exists"
           test -f frontend/scripts/config.js && echo "✅ config.js exists"
