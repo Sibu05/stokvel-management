@@ -1,6 +1,6 @@
 # Stokvel Management Platform
 
-## 📊 CI/CD Status
+## CI/CD Status
 
 | Status | Badge |
 |--------|-------|
@@ -9,5 +9,8 @@
 | **Last Commit** | ![GitHub last commit](https://img.shields.io/github/last-commit/Cyberbot56/stokvel-management) |
 | **Code Size** | ![GitHub repo size](https://img.shields.io/github/repo-size/Cyberbot56/stokvel-management) |
 
-## 🚀 Live Demo
+## Live Demo
 [https://stokvel-management-cpox.vercel.app](https://stokvel-management-cpox.vercel.app)
+
+
+
