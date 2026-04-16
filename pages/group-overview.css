@@ -678,3 +678,22 @@ b.badge, b.admin-badge, b.avatar, b.radio-pill { font-weight: inherit; }
     display: none;
   }
 }
+.action-footer {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+.action-footer button {
+  background: #1f3a5f;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 40px;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.action-footer button:hover {
+  background: #2c4c7a;
+}
