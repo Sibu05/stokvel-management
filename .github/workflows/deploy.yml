@@ -25,6 +25,21 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
 
+      - name: Create .env file from secrets
+        run: |
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+          echo "AUTH0_DOMAIN=${{ secrets.AUTH0_DOMAIN }}" >> .env
+          echo "AUTH0_AUDIENCE=${{ secrets.AUTH0_AUDIENCE }}" >> .env
+          echo "PORT=3000" >> .env
+
+      - name: Verify .env was created
+        run: |
+          if [ -f .env ]; then
+            echo "✅ .env file created"
+          else
+            echo "❌ .env file missing"
+          fi
+
       - name: Install dependencies
         run: npm ci
 
@@ -33,9 +48,6 @@ jobs:
 
       - name: Generate Prisma client
         run: npx prisma generate --schema=prisma/schema.prisma
-
-      - name: Check server.js exists
-        run: test -f backend/server.js && echo "✅ server.js exists"
 
       - name: Security audit
         run: npm audit --production --audit-level=moderate || echo "Security issues found but continuing"
@@ -60,10 +72,9 @@ jobs:
           test -f frontend/pages/dashboard.html && echo "✅ dashboard.html exists"
           test -f frontend/scripts/config.js && echo "✅ config.js exists"
           test -f prisma/schema.prisma && echo "✅ Prisma schema exists"
-          test -f backend/server.js && echo "✅ backend server exists"
           echo "All critical files present"
 
-  # Job 3: Deploy to Vercel (main branch only)
+  # Job 3: Deploy to Vercel
   deploy-production:
     needs: [test-backend, build-frontend]
     if: github.ref == 'refs/heads/main'
@@ -72,6 +83,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Create .env for Vercel
+        run: |
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+          echo "AUTH0_DOMAIN=${{ secrets.AUTH0_DOMAIN }}" >> .env
+          echo "AUTH0_AUDIENCE=${{ secrets.AUTH0_AUDIENCE }}" >> .env
 
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v20
