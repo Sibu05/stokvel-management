@@ -350,6 +350,129 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && !rulesModal.hidden) closeRulesModal();
 });
 
+// This is for the view contributions button.
+
+
+const viewContributionsBtn = document.getElementById("view-contributions-btn");
+
+async function loadAndShowContributions() {
+  const groupId = groupSelect.value;
+  const userId = localStorage.getItem('userId');
+  
+  if (!groupId) {
+    alert("Please select a group first");
+    return;
+  }
+  
+  if (!userId) {
+    alert("User not found. Please log in again.");
+    return;
+  }
+  
+  try {
+    const token = await auth0Client.getTokenSilently();
+    const response = await fetch(`${config.apiBase}/api/contributions/${userId}/${groupId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    if (!response.ok) throw new Error("Failed to load contributions");
+    
+    const data = await response.json();
+    displayContributionsModal(data.contributions);
+    
+  } catch (error) {
+    console.error("Error loading contributions:", error);
+    alert("Could not load contributions: " + error.message);
+  }
+}
+
+function displayContributionsModal(contributions) {
+  // Created a modal to display the contribution history.
+  let modal = document.getElementById("contributions-modal");
+  
+  if (!modal) {
+    modal = document.createElement("aside");
+    modal.id = "contributions-modal";
+    modal.className = "modal-overlay";
+    modal.innerHTML = `
+      <article class="modal">
+        <header class="modal-header">
+          <h2 class="modal-title">My Contribution History</h2>
+          <button class="modal-close" aria-label="Close contributions">✕</button>
+        </header>
+        <div id="contributions-content" class="modal-section"></div>
+      </article>
+    `;
+    document.body.appendChild(modal);
+    
+    modal.querySelector(".modal-close").addEventListener("click", () => {
+      modal.hidden = true;
+    });
+    
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) modal.hidden = true;
+    });
+  }
+  
+  const content = document.getElementById("contributions-content");
+  
+  if (!contributions || contributions.length === 0) {
+    content.innerHTML = '<p style="text-align:center; padding: 2rem;">No contributions found yet.</p>';
+  } else {
+    let totalPaid = 0;
+    let html = `
+      <table style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr style="border-bottom:2px solid #ddd;">
+            <th style="padding:8px; text-align:left;">Date</th>
+            <th style="padding:8px; text-align:left;">Amount</th>
+            <th style="padding:8px; text-align:left;">Status</th>
+            <th style="padding:8px; text-align:left;">Due Date</th>
+           </tr>
+        </thead>
+        <tbody>
+    `;
+    
+    contributions.forEach(contrib => {
+      totalPaid += parseFloat(contrib.amount);
+      const paidDate = contrib.paidAt ? new Date(contrib.paidAt).toLocaleDateString() : "—";
+      const dueDate = contrib.dueDate ? new Date(contrib.dueDate).toLocaleDateString() : "—";
+      
+      html += `
+        <tr style="border-bottom:1px solid #eee;">
+          <td style="padding:8px;">${paidDate}</td>
+          <td style="padding:8px;">${formatCurrency(parseFloat(contrib.amount))}</td>
+          <td style="padding:8px;"><span style="background:#2b7e3a20; color:#2b7e3a; padding:4px 12px; border-radius:20px;">${contrib.status}</span></td>
+          <td style="padding:8px;">${dueDate}</td>
+         </tr>
+      `;
+    });
+    
+    html += `
+        </tbody>
+        <tfoot>
+          <tr style="border-top:2px solid #ddd; font-weight:bold;">
+            <td style="padding:12px 8px;">Total</td>
+            <td style="padding:12px 8px;">${formatCurrency(totalPaid)}</td>
+            <td colspan="2"></td>
+           </tr>
+        </tfoot>
+      </table>
+    `;
+    
+    content.innerHTML = html;
+  }
+  
+  modal.hidden = false;
+}
+
+// Added an event listener for view contributions button
+if (viewContributionsBtn) {
+  viewContributionsBtn.addEventListener("click", loadAndShowContributions);
+}
 
 // ─── Initial page load ────────────────────────────────────────────────────────
 // onAuthReady is called by auth_service.js once auth0Client is fully initialised

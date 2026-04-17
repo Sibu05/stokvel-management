@@ -307,6 +307,72 @@ app.post('/api/groups/add-member', async (req, res) => {
   }
 });
 
+//this is an api to add a user to the contributions table when they make a contribution.
+//It will be used by the tresurer.
+//The api will receive the userId, groupId, amount, and treasurerId.
+//It will have to create a record in the table.
+//This is an initial version, it will be updated later to handle all the different scenarios thst can happen.
+app.post('/api/contributions', async (req, res) => {
+  const { userId, groupId, amount, treasurerId } = req.body; 
+  if(!userId || !groupId || !amount ||!treasurerId ){
+    return res.status(400).json({ 
+      error: "Missing required fields",
+      required: ["userId", "groupId","amount","treasurerId"]
+    });
+  }
+  try{
+    const newcontribution = await prisma.contributions.create({
+      data: {
+        FKgroupId: parseInt(groupId),
+        FKuserId: parseInt(userId),
+        treasurerId: parseInt(treasurerId),
+        amount: amount,
+        dueDate: new Date(), // I will automatically set the due date to the current date for now, we can change this later to be based on the cycle type of the group.
+        paidAt: new Date(),
+        status: "paid"
+      }
+    });
+
+    res.status(201).json({ 
+      message: "Contribution added successfully",
+      contribution: newcontribution
+    });
+  } catch (error) {
+    console.error("Error adding contribution:", error);
+    res.status(500).json({ error: "Failed to add contribution", details: error.message });
+
+  }
+});
+
+
+//This is an api to get all the contributions that belong to a particular user in a particular group.
+//I had to create the post api first so that I can test if mine will work.
+app.get('/api/contributions/:userId/:groupId', async (req, res) => {
+  const {userId,groupId} = req.params;
+
+  try {
+    const contributions = await prisma.contributions.findMany({
+      where: {
+        FKuserId: parseInt(userId),
+        FKgroupId: parseInt(groupId)
+      },
+      orderBy: {
+        paidAt: 'desc'
+      }
+    });
+
+    res.json({
+      userId: parseInt(userId),
+      groupId: parseInt(groupId),
+      count: contributions.length,
+      contributions: contributions
+    });
+  } catch (error) {
+    console.error("Error fetching contributions:", error);
+    res.status(500).json({ error: "Failed to fetch contributions", details: error.message });
+  }
+});
+
 // Create a new invite with a unique token (expires in 7 days)
 app.post('/api/invites', async (req, res) => {
   const { groupId, email, createdBy } = req.body;
