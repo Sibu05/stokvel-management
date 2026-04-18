@@ -54,7 +54,7 @@ const processLoginState = async () => {
             localStorage.setItem("userId", dbUser.userId);
             localStorage.setItem("userName", dbUser.name);
 
-            window.location.href = "dashboard.html";
+            window.location.href = "pages/dashboard.html";
         }
     }
 };

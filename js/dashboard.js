@@ -95,7 +95,7 @@ if (btnAll) {
 
 const btnCreate = document.getElementById('buttonCreateGroup');
 if (btnCreate) {
-    btnCreate.onclick = () => window.location.href = 'create-group.html';
+    btnCreate.onclick = () => window.location.href = 'pages/create-group.html';
 }
 
 // onAuthReady is called by auth_service.js once auth0Client is fully initialised

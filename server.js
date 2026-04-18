@@ -513,6 +513,59 @@ app.delete('/api/invites/:inviteId', async (req, res) => {
   }
 });
 
+// POST: Record a new contribution
+app.post('/api/contributions', async (req, res) => {
+  const { userId, groupId, amount, treasurerId, paidAt } = req.body;
+
+  if (!userId || !groupId || !amount || !treasurerId) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  try {
+    const newContribution = await prisma.contributions.create({
+      data: {
+        groupId: parseInt(groupId),
+        userId: parseInt(userId),
+        treasurerId: parseInt(treasurerId),
+        amount: parseFloat(amount),
+        dueDate: new Date(), // Logic can be updated for billing cycles later
+        paidAt: paidAt ? new Date(paidAt) : new Date(),
+        status: "paid"
+      }
+    });
+
+    res.status(201).json({ message: "Contribution recorded!", contribution: newContribution });
+  } catch (error) {
+    res.status(500).json({ error: "Database error", details: error.message });
+  }
+});
+
+// GET: Fetch members and their latest contribution for a group
+app.get('/api/groups/:groupId/treasurer-view', async (req, res) => {
+  const { groupId } = req.params;
+
+  try {
+    const members = await prisma.group_members.findMany({
+      where: { FgroupId: parseInt(groupId) },
+      include: {
+        users: {
+          include: {
+            // Fetch only the most recent contribution for the status pill
+            contributions: {
+              where: { groupId: parseInt(groupId) },
+              orderBy: { paidAt: 'desc' },
+              take: 1
+            }
+          }
+        }
+      }
+    });
+    res.json(members);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch dashboard data" });
+  }
+});
+
 
 //The port is from the .env file, if not found it defaults to 3000.
 const PORT = process.env.PORT || 3000; 
@@ -520,3 +573,5 @@ app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
   console.log(`Open http://localhost:${PORT}/index.html to view the frontend`);
 });
+
+module.exports = app;
