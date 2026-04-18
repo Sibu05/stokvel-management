@@ -31,7 +31,7 @@ function loadContributions() {
   document.getElementById('emptyState').hidden  = true;
   document.getElementById('errorBanner').hidden = true;
 
-  fetch('/contributions/group/' + currentGroupId, {
+  fetch('api/get-all-contributions/group/' + currentGroupId, {
     credentials: 'include'
   })
     .then(function(res) {

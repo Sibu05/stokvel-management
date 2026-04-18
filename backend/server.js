@@ -9,7 +9,7 @@ const prisma = new PrismaClient({
     log: ['error']
 });
 
-const crypto = require('crypto');
+
 const cors = require('cors');
 const express = require('express');
 const path = require('path');
@@ -28,13 +28,8 @@ app.use(express.json());
 // Serve the entire frontend folder as static files
 // Since server.js is now in backend/, we go up one level to reach frontend/
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
-
-function generateUniqueToken() {
-  return crypto.randomBytes(32).toString('hex');
-}
-
 // Health check endpoint for monitoring
-app.get('/health', (req, res) => {
+  app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
@@ -87,24 +82,6 @@ app.post('/api/auth/register', async (req, res) => {
     res.status(400).json({ error: "Failed to create user", details: error.message });
   }
 });
-
-// Login — returns user data by email or 404
-app.post('/api/auth/login', async (req, res) => {
-  const { email } = req.body;
-  try {
-    const user = await prisma.users.findUnique({
-      where: { email: email }
-    });
-    if (user) {
-      res.json(user);
-    } else {
-      res.status(404).json({ error: "User not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
 // Get all users (admin/debug use)
 app.get('/api/users', async (req, res) => {
   try {
@@ -378,6 +355,8 @@ app.get('/api/contributions/:userId/:groupId', async (req, res) => {
 //The admin will enter an email of a user that they want to assign as a treasurer.
 //The api will have to check if the user exists and if they are a member of the group.
 //The api will take the email and the groupId as parameters.
+//We also have to check if the group already has a treasure then we remove the old treasurer then put the new one 
+
 app.post('/api/groups/assign-treasurer', async (req, res) => {
   const { email, groupId } = req.body;  
   if (!email || !groupId) {
@@ -409,6 +388,15 @@ app.post('/api/groups/assign-treasurer', async (req, res) => {
       });
     }
     
+    const alreadytreasurer = await prisma.group_members.update({
+      where: {
+        FKgroupId: parseInt(groupId),
+        role: "treasurer"
+      },
+      data:{
+        role: "member"
+      }
+    });
     
     const updatedMembership = await prisma.group_members.update({
       where: {
@@ -435,45 +423,21 @@ app.post('/api/groups/assign-treasurer', async (req, res) => {
     res.status(500).json({ error: "Failed to assign treasurer", details: error.message });
   }
 });
-
-// Catch-all: serve index.html for any non-API route (SPA support)
-app.get(/.*/, (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'frontend', 'pages', 'index.html'));
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-<<<<<<< HEAD:backend/server.js
-  console.log(`Frontend served from: ${path.join(__dirname, '..', 'frontend')}`);
-=======
-  console.log(`Open http://localhost:${PORT}/index.html to view the frontend`);
-});
-
-// =======================================================
-// TWO ROUTES FOR MISSED CONTRIBUTIONS_TREASURER -server.js
-// =======================================================
-
-
 // ── ROUTE 1 ─────────────────────────────────────────────
 // GET /contributions/group/:groupId
 // Returns all contributions for a group with member names.
 // Only accessible by the group's treasurer.
 // ────────────────────────────────────────────────────────
-app.get('/contributions/group/:groupId', async (req, res) => {
+app.get('api/get-all-contributions/group/:userId/:groupId', async (req, res) => {
 
-  if (!req.session || !req.session.userId) {
-    return res.status(401).json({ error: 'Not logged in' });
-  }
-
-  const groupId = parseInt(req.params.groupId);
+  const {userId,groupId} = req.params;
 
   try {
     // Confirm the caller is a treasurer of this group
     const caller = await prisma.group_members.findFirst({
       where: {
         FgroupId: groupId,
-        SuserId:  req.session.userId,
+        SuserId:  userId,
         role:     'treasurer'
       }
     });
@@ -515,11 +479,7 @@ app.get('/contributions/group/:groupId', async (req, res) => {
 // Only accessible by the treasurer of the contribution's group.
 // Body: { "note": "optional reason" }
 // ────────────────────────────────────────────────────────
-app.patch('/contributions/:contributionId/flag', async (req, res) => {
-
-  if (!req.session || !req.session.userId) {
-    return res.status(401).json({ error: 'Not logged in' });
-  }
+app.patch('api/missed-contributions/:contributionId/flag', async (req, res) => {
 
   const contributionId = parseInt(req.params.contributionId);
   const { note } = req.body;
@@ -561,6 +521,13 @@ app.patch('/contributions/:contributionId/flag', async (req, res) => {
     console.error('Error flagging contribution:', error);
     res.status(500).json({ error: 'Could not flag contribution' });
   }
+});
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'pages', 'index.html'));
+});
 
->>>>>>> origin/Missed-contributions:server.js
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Frontend served from: ${path.join(__dirname, '..', 'frontend')}`);
 });

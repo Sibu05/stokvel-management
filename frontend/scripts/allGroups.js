@@ -60,6 +60,11 @@ function renderGroups(groups) {
             const dest = group.userRole === 'admin' ? 'group-admin.html' : 'group-overview.html';
             window.location.href = `${dest}?groupId=${group.groupId}`;
         });
+        
+        card.querySelector('.btnViewGroup').addEventListener('click',()=>{
+            const dest = group.userRole === 'treasurer' ? 'group-treasurer.html' : 'group-overview.html';
+            window.location.href = '${dest}?groupId=${group.groupId}';
+        });
 
         grid.appendChild(card);
     });
