@@ -134,7 +134,7 @@ app.post('/api/groups', async (req, res) => {
         data: {
           name: name,
           description: description,
-          contributionAmount: parseInt(contributionAmount),
+          contributionAmount: parseFloat(contributionAmount),
           cycleType: cycleType,
           payoutOrder: payoutOrder,
           startDate: new Date(),
@@ -307,191 +307,132 @@ app.post('/api/groups/add-member', async (req, res) => {
   }
 });
 
-// Create a new invite with a unique token (expires in 7 days)
-app.post('/api/invites', async (req, res) => {
-  const { groupId, email, createdBy } = req.body;
-
-  if (!groupId || !email || !createdBy) {
-    return res.status(400).json({
+//this is an api to add a user to the contributions table when they make a contribution.
+//It will be used by the tresurer.
+//The api will receive the userId, groupId, amount, and treasurerId.
+//It will have to create a record in the table.
+//This is an initial version, it will be updated later to handle all the different scenarios thst can happen.
+app.post('/api/contributions', async (req, res) => {
+  const { userId, groupId, amount, treasurerId } = req.body; 
+  if(!userId || !groupId || !amount ||!treasurerId ){
+    return res.status(400).json({ 
       error: "Missing required fields",
-      required: ["groupId", "email", "createdBy"]
+      required: ["userId", "groupId","amount","treasurerId"]
     });
   }
-
-  if (!email.includes('@')) {
-    return res.status(400).json({ error: "Invalid email format" });
-  }
-
-  try {
-    const group = await prisma.groups.findUnique({
-      where: { groupId: parseInt(groupId) }
-    });
-
-    if (!group) {
-      return res.status(404).json({ error: "Group not found" });
-    }
-
-    const user = await prisma.users.findUnique({
-      where: { userId: parseInt(createdBy) }
-    });
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    let token = crypto.randomBytes(32).toString('hex');
-
-    const createdAt = new Date();
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7);
-
-    const newInvite = await prisma.group_invites.create({
+  try{
+    const newcontribution = await prisma.contributions.create({
       data: {
-        SFKgroupId: parseInt(groupId),
-        token: token,
-        email: email,
-        createdBy: parseInt(createdBy),
-        createdAt: createdAt,
-        expiresAt: expiresAt,
-        status: "active"
+        FKgroupId: parseInt(groupId),
+        FKuserId: parseInt(userId),
+        treasurerId: parseInt(treasurerId),
+        amount: amount,
+        dueDate: new Date(), // I will automatically set the due date to the current date for now, we can change this later to be based on the cycle type of the group.
+        paidAt: new Date(),
+        status: "paid"
       }
     });
 
-    res.status(201).json({
-      message: "Invite sent successfully",
-      invite: newInvite,
-      inviteLink: `${process.env.FRONTEND_URL || "http://localhost:5500"}/join?token=${token}`
+    res.status(201).json({ 
+      message: "Contribution added successfully",
+      contribution: newcontribution
     });
   } catch (error) {
-    console.error("Error creating invite:", error);
-    res.status(400).json({ error: "Failed to create invite", details: error.message });
+    console.error("Error adding contribution:", error);
+    res.status(500).json({ error: "Failed to add contribution", details: error.message });
+
   }
 });
 
-// Get all invites for a specific group
-app.get('/api/invites/group/:groupId', async (req, res) => {
-  const { groupId } = req.params;
+
+//This is an api to get all the contributions that belong to a particular user in a particular group.
+//I had to create the post api first so that I can test if mine will work.
+app.get('/api/contributions/:userId/:groupId', async (req, res) => {
+  const {userId,groupId} = req.params;
 
   try {
-    const invites = await prisma.group_invites.findMany({
-      where: { SFKgroupId: parseInt(groupId) },
-      orderBy: { createdAt: 'desc' },
-      include: {
-        users: {
-          select: { name: true, email: true }
-        }
-      }
-    });
-
-    res.json({
-      groupId: parseInt(groupId),
-      count: invites.length,
-      invites: invites
-    });
-  } catch (error) {
-    console.error("Error fetching invites:", error);
-    res.status(500).json({ error: "Failed to fetch invites", details: error.message });
-  }
-});
-
-// Get all invites (admin)
-app.get('/api/invites', async (req, res) => {
-  try {
-    const invites = await prisma.group_invites.findMany({
-      orderBy: { createdAt: 'desc' },
-      include: {
-        groups: { select: { name: true } },
-        users: { select: { name: true, email: true } }
-      }
-    });
-
-    res.json({
-      count: invites.length,
-      invites: invites
-    });
-  } catch (error) {
-    console.error("Error fetching all invites:", error);
-    res.status(500).json({ error: "Failed to fetch invites", details: error.message });
-  }
-});
-
-// Join a group using an invite token
-app.post('/api/invites/join', async (req, res) => {
-  const { token, userId } = req.body;
-
-  if (!token || !userId) {
-    return res.status(400).json({
-      error: "Missing required fields",
-      required: ["token", "userId"]
-    });
-  }
-
-  try {
-    const invite = await prisma.group_invites.findUnique({
-      where: { token: token }
-    });
-
-    if (!invite) {
-      return res.status(404).json({ error: "Invalid invite token" });
-    }
-
-    const now = new Date();
-    if (invite.expiresAt < now) {
-      return res.status(400).json({ error: "Invite has expired" });
-    }
-
-    if (invite.status !== "active") {
-      return res.status(400).json({ error: "Invite has been revoked" });
-    }
-
-    const existingMember = await prisma.group_members.findFirst({
+    const contributions = await prisma.contributions.findMany({
       where: {
-        FgroupId: invite.SFKgroupId,
-        SuserId: parseInt(userId)
+        FKuserId: parseInt(userId),
+        FKgroupId: parseInt(groupId)
+      },
+      orderBy: {
+        paidAt: 'desc'
       }
-    });
-
-    if (existingMember) {
-      return res.status(400).json({ error: "User is already a member of this group" });
-    }
-
-    const newMember = await prisma.group_members.create({
-      data: {
-        FgroupId: invite.SFKgroupId,
-        SuserId: parseInt(userId),
-        role: "member",
-        joinedAt: now
-      }
-    });
-
-    res.status(201).json({
-      message: "Successfully joined the group",
-      groupId: invite.SFKgroupId,
-      member: newMember
-    });
-  } catch (error) {
-    console.error("Error joining group:", error);
-    res.status(400).json({ error: "Failed to join group", details: error.message });
-  }
-});
-
-// Revoke an invite (admin)
-app.delete('/api/invites/:inviteId', async (req, res) => {
-  const { inviteId } = req.params;
-
-  try {
-    const revokedInvite = await prisma.group_invites.update({
-      where: { group_inviteId: parseInt(inviteId) },
-      data: { status: "revoked" }
     });
 
     res.json({
-      message: "Invite revoked successfully",
-      invite: revokedInvite
+      userId: parseInt(userId),
+      groupId: parseInt(groupId),
+      count: contributions.length,
+      contributions: contributions
     });
   } catch (error) {
-    console.error("Error revoking invite:", error);
-    res.status(400).json({ error: "Failed to revoke invite", details: error.message });
+    console.error("Error fetching contributions:", error);
+    res.status(500).json({ error: "Failed to fetch contributions", details: error.message });
+  }
+});
+
+//This is an api to assign a treasurer to a group.
+//It will be used by the admin of the group to assign a treasurer to the group.
+//The admin will enter an email of a user that they want to assign as a treasurer.
+//The api will have to check if the user exists and if they are a member of the group.
+//The api will take the email and the groupId as parameters.
+app.post('/api/groups/assign-treasurer', async (req, res) => {
+  const { email, groupId } = req.body;  
+  if (!email || !groupId) {
+    return res.status(400).json({
+      error: "Missing required fields",
+      required: ["email", "groupId"]
+    });
+  }   
+  try {
+    const user = await prisma.users.findUnique({
+      where: { email: email }
+    });
+    if (!user) {
+      return res.status(404).json({
+        error: "User not found. Please ask the user to create an account first."
+      });
+    }
+    
+    const membership = await prisma.group_members.findFirst({
+      where: {
+        FgroupId: parseInt(groupId),  
+        SuserId: user.userId
+      }
+    }); 
+    
+    if (!membership) {
+      return res.status(400).json({
+        error: "User is not a member of the group. Please add the user to the group first."
+      });
+    }
+    
+    
+    const updatedMembership = await prisma.group_members.update({
+      where: {
+        group_memberId: membership.group_memberId  
+      },
+      data: {
+        role: "treasurer"
+      }
+    });
+    
+    res.status(200).json({
+      message: "Treasurer assigned successfully", 
+      member: {
+        groupId: parseInt(groupId),
+        userEmail: user.email,  
+        userName: user.name,
+        groupName: membership.groups?.name || "the group",
+        role: updatedMembership.role,
+        joinedAt: updatedMembership.joinedAt
+      }
+    });
+  } catch (error) {
+    console.error("Error assigning treasurer:", error);
+    res.status(500).json({ error: "Failed to assign treasurer", details: error.message });
   }
 });
 
@@ -616,5 +557,123 @@ app.get(/.*/, (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
+<<<<<<< HEAD:backend/server.js
   console.log(`Frontend served from: ${path.join(__dirname, '..', 'frontend')}`);
+=======
+  console.log(`Open http://localhost:${PORT}/index.html to view the frontend`);
+});
+
+// =======================================================
+// TWO ROUTES FOR MISSED CONTRIBUTIONS_TREASURER -server.js
+// =======================================================
+
+
+// ── ROUTE 1 ─────────────────────────────────────────────
+// GET /contributions/group/:groupId
+// Returns all contributions for a group with member names.
+// Only accessible by the group's treasurer.
+// ────────────────────────────────────────────────────────
+app.get('/contributions/group/:groupId', async (req, res) => {
+
+  if (!req.session || !req.session.userId) {
+    return res.status(401).json({ error: 'Not logged in' });
+  }
+
+  const groupId = parseInt(req.params.groupId);
+
+  try {
+    // Confirm the caller is a treasurer of this group
+    const caller = await prisma.group_members.findFirst({
+      where: {
+        FgroupId: groupId,
+        SuserId:  req.session.userId,
+        role:     'treasurer'
+      }
+    });
+
+    if (!caller) {
+      return res.status(403).json({ error: 'Treasurer access only' });
+    }
+
+    const contributions = await prisma.contributions.findMany({
+      where: {
+        FgroupId: groupId
+      },
+      include: {
+        users: {
+          select: {
+            name:  true,
+            email: true
+          }
+        }
+      },
+      orderBy: {
+        dueDate: 'asc'
+      }
+    });
+
+    res.json(contributions);
+
+  } catch (error) {
+    console.error('Error fetching contributions:', error);
+    res.status(500).json({ error: 'Could not fetch contributions' });
+  }
+
+});
+
+
+// ── ROUTE 2 ─────────────────────────────────────────────
+// PATCH /contributions/:contributionId/flag
+// Flags a contribution as missed.
+// Only accessible by the treasurer of the contribution's group.
+// Body: { "note": "optional reason" }
+// ────────────────────────────────────────────────────────
+app.patch('/contributions/:contributionId/flag', async (req, res) => {
+
+  if (!req.session || !req.session.userId) {
+    return res.status(401).json({ error: 'Not logged in' });
+  }
+
+  const contributionId = parseInt(req.params.contributionId);
+  const { note } = req.body;
+
+  try {
+    // Find the contribution first so we know which group it belongs to
+    const contribution = await prisma.contributions.findUnique({
+      where: { contributionId }
+    });
+
+    if (!contribution) {
+      return res.status(404).json({ error: 'Contribution not found' });
+    }
+
+    // Confirm the caller is treasurer of that group
+    const caller = await prisma.group_members.findFirst({
+      where: {
+        FgroupId: contribution.FgroupId,
+        SuserId:  req.session.userId,
+        role:     'treasurer'
+      }
+    });
+
+    if (!caller) {
+      return res.status(403).json({ error: 'Treasurer access only' });
+    }
+
+    const updated = await prisma.contributions.update({
+      where: { contributionId },
+      data: {
+        status: 'missed',
+        note:   note || null
+      }
+    });
+
+    res.json(updated);
+
+  } catch (error) {
+    console.error('Error flagging contribution:', error);
+    res.status(500).json({ error: 'Could not flag contribution' });
+  }
+
+>>>>>>> origin/Missed-contributions:server.js
 });
