@@ -119,7 +119,7 @@ const payoutDateEl        = document.getElementById("payout-date");
 const countdownEl         = document.getElementById("payout-countdown");
 const countdownNumEl      = document.getElementById("countdown-num");
 const membersGrid         = document.getElementById("members-grid");
-const viewRulesBtn        = document.getElementById("view-rules-btn");
+const viewPayoutsBtn      = document.getElementById("view-payouts-btn");
 const rulesModal          = document.getElementById("rules-modal");
 const closeModalBtn       = document.getElementById("close-modal-btn");
 const modalAmount         = document.getElementById("modal-amount");
@@ -336,8 +336,10 @@ refreshBtn.addEventListener("click", () => {
   loadUserGroups();
 });
 
-viewRulesBtn.addEventListener("click", () => {
-  loadAndOpenRules(groupSelect.value);
+// "View payouts" navigates to the upcoming payouts page
+// passes the groupId in the URL so the payouts page knows which group to load
+viewPayoutsBtn.addEventListener("click", () => {
+  window.location.href = "upcompayme.html?groupId=" + groupSelect.value;
 });
 
 closeModalBtn.addEventListener("click", closeRulesModal);
@@ -486,4 +488,5 @@ const setAvatar = () => {
 function onAuthReady() {
     setAvatar();
     loadUserGroups();
+}
 }
