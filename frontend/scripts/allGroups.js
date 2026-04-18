@@ -21,7 +21,7 @@ const setWelcome = () => {
 // Store both lists once fetched so toggling doesn't re-fetch
 let allGroupsCache = [];
 let myGroupsCache = [];
-let currentView = 'all'; // 'all' or 'mine'
+let currentView = 'all'; // 'all'
 
 function renderGroups(groups) {
     const grid = document.querySelector('.groups-grid');
@@ -57,8 +57,18 @@ function renderGroups(groups) {
         `;
 
         card.querySelector('.btnViewGroup').addEventListener('click', () => {
-            const dest = group.userRole === 'admin' ? 'group-admin.html' : 'group-overview.html';
-            window.location.href = `${dest}?groupId=${group.groupId}`;
+            // Determine where to redirect based on user role 
+            //Because the admin/ treasure and member page might be different
+            
+            let destination;
+            if (group.userRole === 'admin') {
+                destination = 'group-admin.html';
+            } else if (group.userRole === 'treasurer') {
+                destination = 'group-treasurer.html';
+            } else {
+                destination = 'group-overview.html';
+            }
+            window.location.href = `${destination}?groupId=${group.groupId}`;
         });
 
         grid.appendChild(card);
@@ -118,14 +128,16 @@ async function loadAllGroups() {
         const allGroups = await allGroupsRes.json();
         const myGroups = await myGroupsRes.json();
 
-        // Build role map from user's memberships
+        // Build role map from user's memberships (includes admin, treasurer, member)
         const roleMap = {};
-        myGroups.forEach(g => { roleMap[g.groupId] = g.userRole; });
+        myGroups.forEach(g => { 
+            roleMap[g.groupId] = g.userRole; 
+        });
 
         // All groups with role merged in
         allGroupsCache = allGroups.map(group => ({
             ...group,
-            userRole: roleMap[group.groupId] ?? null
+            userRole: roleMap[group.groupId] || null
         }));
 
         // My groups already have userRole from the API
