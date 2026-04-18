@@ -9,10 +9,10 @@ const prisma = new PrismaClient({
     log: ['error']
 });
 
-
 const cors = require('cors');
 const express = require('express');
 const path = require('path');
+const crypto = require('crypto');
 const app = express();
 
 app.use(cors({
@@ -28,17 +28,14 @@ app.use(express.json());
 // Serve the entire frontend folder as static files
 // Since server.js is now in backend/, we go up one level to reach frontend/
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
-<<<<<<< HEAD
-=======
 app.use(express.static(path.join(__dirname, '..', 'frontend', 'pages')));
 
 function generateUniqueToken() {
   return crypto.randomBytes(32).toString('hex');
 }
 
->>>>>>> 3d93ac5bab7027b231885ad986a73d6b69ae6eea
 // Health check endpoint for monitoring
-  app.get('/health', (req, res) => {
+app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
@@ -397,19 +394,17 @@ app.post('/api/groups/assign-treasurer', async (req, res) => {
       });
     }
     
-<<<<<<< HEAD
-    const alreadytreasurer = await prisma.group_members.update({
+    // Remove existing treasurer if any
+    await prisma.group_members.updateMany({
       where: {
-        FKgroupId: parseInt(groupId),
+        FgroupId: parseInt(groupId),
         role: "treasurer"
       },
-      data:{
+      data: {
         role: "member"
       }
     });
     
-=======
->>>>>>> 3d93ac5bab7027b231885ad986a73d6b69ae6eea
     const updatedMembership = await prisma.group_members.update({
       where: {
         group_memberId: membership.group_memberId  
@@ -435,22 +430,12 @@ app.post('/api/groups/assign-treasurer', async (req, res) => {
     res.status(500).json({ error: "Failed to assign treasurer", details: error.message });
   }
 });
-<<<<<<< HEAD
-=======
-
-// =======================================================
-// TWO ROUTES FOR MISSED CONTRIBUTIONS_TREASURER -server.js
-// =======================================================
-
-
->>>>>>> 3d93ac5bab7027b231885ad986a73d6b69ae6eea
 // ── ROUTE 1 ─────────────────────────────────────────────
 // GET /contributions/group/:groupId
 // Returns all contributions for a group with member names.
 // Only accessible by the group's treasurer.
 // ────────────────────────────────────────────────────────
-<<<<<<< HEAD
-app.get('api/get-all-contributions/group/:userId/:groupId', async (req, res) => {
+app.get('/api/get-all-contributions/group/:userId/:groupId', async (req, res) => {
 
   const {userId,groupId} = req.params;
 
@@ -458,8 +443,8 @@ app.get('api/get-all-contributions/group/:userId/:groupId', async (req, res) => 
     // Confirm the caller is a treasurer of this group
     const caller = await prisma.group_members.findFirst({
       where: {
-        FgroupId: groupId,
-        SuserId:  userId,
+        FgroupId: parseInt(groupId),
+        SuserId:  parseInt(userId),
         role:     'treasurer'
       }
     });
@@ -468,15 +453,9 @@ app.get('api/get-all-contributions/group/:userId/:groupId', async (req, res) => 
       return res.status(403).json({ error: 'Treasurer access only' });
     }
 
-=======
-app.get('/contributions/group/:groupId', requireAuth, async (req, res) => {
-  const groupId = parseInt(req.params.groupId);
-
-  try {
->>>>>>> 3d93ac5bab7027b231885ad986a73d6b69ae6eea
     const contributions = await prisma.contributions.findMany({
       where: {
-        FKgroupId: groupId
+        FKgroupId: parseInt(groupId)
       },
       include: {
         users: {
@@ -506,12 +485,8 @@ app.get('/contributions/group/:groupId', requireAuth, async (req, res) => {
 // Only accessible by the treasurer of the contribution's group.
 // Body: { "note": "optional reason" }
 // ────────────────────────────────────────────────────────
-<<<<<<< HEAD
-app.patch('api/missed-contributions/:contributionId/flag', async (req, res) => {
+app.patch('/api/missed-contributions/:contributionId/flag', async (req, res) => {
 
-=======
-app.patch('/contributions/:contributionId/flag', requireAuth, async (req, res) => {
->>>>>>> 3d93ac5bab7027b231885ad986a73d6b69ae6eea
   const contributionId = parseInt(req.params.contributionId);
   const { note } = req.body;
 
@@ -539,138 +514,12 @@ app.patch('/contributions/:contributionId/flag', requireAuth, async (req, res) =
     res.status(500).json({ error: 'Could not flag contribution' });
   }
 });
-<<<<<<< HEAD
 app.get(/.*/, (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'frontend', 'pages', 'index.html'));
 });
 
-=======
-
-// Get all payouts for a group
-app.get('/api/payouts/group/:groupId', requireAuth, async (req, res) => {
-  const { groupId } = req.params;
-  try {
-    const payouts = await prisma.payout.findMany({
-      where: { groupId: parseInt(groupId) },
-      orderBy: { initiatedAt: 'desc' },
-      include: {
-        recipient: { select: { userId: true, name: true, email: true } },
-        initiator: { select: { userId: true, name: true } }
-      }
-    });
-    res.json(payouts);
-  } catch (error) {
-    console.error('Error fetching payouts:', error);
-    res.status(500).json({ error: 'Failed to fetch payouts', details: error.message });
-  }
-});
- 
-// Initiate a new payout
-app.post('/api/payouts', requireAuth, async (req, res) => {
-  const { groupId, recipientId, recipientName, amount, cycleNumber, notes } = req.body;
-  const initiatedBy = req.user.userId;
- 
-  if (!groupId || !recipientId || !amount || !cycleNumber) {
-    return res.status(400).json({
-      error: 'Missing required fields',
-      required: ['groupId', 'recipientId', 'amount', 'cycleNumber']
-    });
-  }
- 
-  try {
-    const group = await prisma.groups.findUnique({ where: { groupId: parseInt(groupId) } });
-    if (!group) return res.status(404).json({ error: 'Group not found' });
- 
-    const membership = await prisma.group_members.findFirst({
-      where: { FgroupId: parseInt(groupId), SuserId: parseInt(recipientId) }
-    });
-    if (!membership) {
-      return res.status(400).json({ error: 'Recipient is not a member of this group' });
-    }
- 
-    const existingPayout = await prisma.payout.findFirst({
-      where: {
-        groupId: parseInt(groupId),
-        cycleNumber: parseInt(cycleNumber),
-        status: { in: ['pending', 'completed'] }
-      }
-    });
-    if (existingPayout) {
-      return res.status(400).json({ error: `A payout for cycle ${cycleNumber} has already been initiated` });
-    }
- 
-    const transactionRef = `PAY-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
- 
-    const payout = await prisma.payout.create({
-      data: {
-        groupId: parseInt(groupId),
-        recipientId: parseInt(recipientId),
-        recipientName: recipientName,
-        amount: parseFloat(amount),
-        cycleNumber: parseInt(cycleNumber),
-        notes: notes || null,
-        initiatedBy: initiatedBy,
-        status: 'pending',
-        transactionRef: transactionRef,
-        initiatedAt: new Date()
-      },
-      include: {
-        recipient: { select: { name: true, email: true } },
-        initiator: { select: { name: true } }
-      }
-    });
- 
-    res.status(201).json({ message: 'Payout initiated successfully', payout });
-  } catch (error) {
-    console.error('Error initiating payout:', error);
-    res.status(500).json({ error: 'Failed to initiate payout', details: error.message });
-  }
-});
-
-// Ohh this function does this, it updates payout status which marks it as completed or cancelled
-app.patch('/api/payouts/:payoutId', requireAuth, async (req, res) => {
-  const { payoutId } = req.params;
-  const { status } = req.body;
-
-  const validStatuses = ['completed', 'cancelled'];
-  if (!validStatuses.includes(status)) {
-    return res.status(400).json({ error: `Status must be one of: ${validStatuses.join(', ')}` });
-  }
-
-  try {
-    const payout = await prisma.payout.findUnique({ where: { payoutId: parseInt(payoutId) } });
-    if (!payout) return res.status(404).json({ error: 'Payout not found' });
-    if (payout.status === 'completed') {
-      return res.status(400).json({ error: 'Payout is already completed' });
-    }
- 
-    const updated = await prisma.payout.update({
-      where: { payoutId: parseInt(payoutId) },
-      data: {
-        status,
-        processedAt: status === 'completed' ? new Date() : null
-      }
-    });
- 
-    res.json({ message: `Payout marked as ${status}`, payout: updated });
-  } catch (error) {
-    console.error('Error updating payout:', error);
-    res.status(500).json({ error: 'Failed to update payout', details: error.message });
-  }
-});
-
-// Catch-all: serve index.html for any non-API route (SPA support)
-app.get(/.*/, (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'frontend', 'pages', 'index.html'));
-});
-
->>>>>>> 3d93ac5bab7027b231885ad986a73d6b69ae6eea
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
   console.log(`Frontend served from: ${path.join(__dirname, '..', 'frontend')}`);
-<<<<<<< HEAD
 });
-=======
-});
->>>>>>> 3d93ac5bab7027b231885ad986a73d6b69ae6eea
