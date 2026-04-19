@@ -35,9 +35,9 @@ jobs:
         run: npm ci
 
       - name: Generate Prisma client
-        run: |
-          export DATABASE_URL="${{ secrets.DATABASE_URL }}"
-          npx prisma generate --schema=prisma/schema.prisma
+        run: npx prisma generate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Security audit
         run: npm audit --production --audit-level=moderate || echo "Security issues found but continuing"
@@ -45,11 +45,19 @@ jobs:
       - name: Run tests
         id: test_results
         run: |
-          npm test || true
+          npm test -- --json --outputFile=results.json || true
 
-          TOTAL=$(cat results.json | jq '.numTotalTests')
-          PASSED=$(cat results.json | jq '.numPassedTests')
-          FAILED=$(cat results.json | jq '.numFailedTests')
+          # Safely read results — default to 0 if file missing or fields absent
+          if [ -f results.json ]; then
+            TOTAL=$(jq '.numTotalTests // 0' results.json)
+            PASSED=$(jq '.numPassedTests // 0' results.json)
+            FAILED=$(jq '.numFailedTests // 0' results.json)
+          else
+            echo "⚠️ results.json not found — no tests ran"
+            TOTAL=0
+            PASSED=0
+            FAILED=0
+          fi
 
           if [ "$TOTAL" -eq 0 ]; then
             PERCENT=0
@@ -57,11 +65,18 @@ jobs:
             PERCENT=$(echo "scale=0; $PASSED * 100 / $TOTAL" | bc)
           fi
 
-          echo "total=$TOTAL"   >> $GITHUB_OUTPUT
-          echo "passed=$PASSED" >> $GITHUB_OUTPUT
-          echo "failed=$FAILED" >> $GITHUB_OUTPUT
+          echo "total=$TOTAL"     >> $GITHUB_OUTPUT
+          echo "passed=$PASSED"   >> $GITHUB_OUTPUT
+          echo "failed=$FAILED"   >> $GITHUB_OUTPUT
           echo "percent=$PERCENT" >> $GITHUB_OUTPUT
+
           echo "✅ Passed: $PASSED / $TOTAL ($PERCENT%)"
+
+          # Fail the job if any tests actually ran and some failed
+          if [ "$TOTAL" -gt 0 ] && [ "$FAILED" -gt 0 ]; then
+            echo "❌ $FAILED test(s) failed"
+            exit 1
+          fi
 
       - name: Set badge color
         id: badge_color
@@ -99,11 +114,11 @@ jobs:
       - name: Check static files
         run: |
           echo "Checking critical files..."
-          test -f frontend/pages/index.html && echo "✅ index.html exists"
-          test -f frontend/pages/dashboard.html && echo "✅ dashboard.html exists"
-          test -f frontend/scripts/config.js && echo "✅ config.js exists"
-          test -f prisma/schema.prisma && echo "✅ Prisma schema exists"
-          echo "All critical files present"
+          test -f frontend/pages/index.html     && echo "✅ index.html exists"     || echo "❌ index.html MISSING"
+          test -f frontend/pages/dashboard.html && echo "✅ dashboard.html exists" || echo "❌ dashboard.html MISSING"
+          test -f frontend/scripts/config.js    && echo "✅ config.js exists"      || echo "❌ config.js MISSING"
+          test -f prisma/schema.prisma          && echo "✅ Prisma schema exists"  || echo "❌ schema.prisma MISSING"
+          echo "File check complete"
 
   deploy-production:
     needs: [test-backend, build-frontend]
