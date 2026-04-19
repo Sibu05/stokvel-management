@@ -45,7 +45,7 @@ jobs:
       - name: Run tests
         id: test_results
         run: |
-          npm test -- --json --outputFile=results.json || true
+          npm test || true
 
           # Safely read results — default to 0 if file missing or fields absent
           if [ -f results.json ]; then
