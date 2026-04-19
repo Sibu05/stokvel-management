@@ -367,7 +367,7 @@ progress::-moz-progress-bar      { background: #0e9490; border-radius: 99px; }
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
-#view-payouts-btn: hover {
+#view-payouts-btn:hover {
   background: #e0f7f6;
   transform: translateY(-1px);
 }
