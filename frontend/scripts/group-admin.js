@@ -554,7 +554,7 @@ async function loadAndShowContributions() {
         alert('Could not load contributions: ' + error.message);
     }
 }
-
+//useless
 function displayContributionsModal(contributions) {
     let modal = document.getElementById('contributions-modal');
 
