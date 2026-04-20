@@ -122,183 +122,183 @@ function populateRecipientDropdown(members) {
     });
 }
 
-// Update payout amount preview
-function updatePayoutPreview() {
-    if (!currentGroup) return;
-    const totalPayout = currentGroup.contributionAmount * currentGroup.totalMembers;
-    document.getElementById('payout-amount-display').textContent = formatCurrency(totalPayout);
-}
+// // Update payout amount preview
+// function updatePayoutPreview() {
+//     if (!currentGroup) return;
+//     const totalPayout = currentGroup.contributionAmount * currentGroup.totalMembers;
+//     document.getElementById('payout-amount-display').textContent = formatCurrency(totalPayout);
+// }
 
-// Render payout history
-function renderPayouts(payouts) {
-    const container = document.getElementById('payouts-container');
-    const countEl = document.getElementById('payout-count');
-    countEl.textContent = payouts.length + ' total';
+// // Render payout history
+// function renderPayouts(payouts) {
+//     const container = document.getElementById('payouts-container');
+//     const countEl = document.getElementById('payout-count');
+//     countEl.textContent = payouts.length + ' total';
 
-    if (payouts.length === 0) {
-        container.innerHTML = '<p class="empty-payouts">No payouts have been initiated yet.</p>';
-        return;
-    }
+//     if (payouts.length === 0) {
+//         container.innerHTML = '<p class="empty-payouts">No payouts have been initiated yet.</p>';
+//         return;
+//     }
 
-    const rows = payouts.map(p => {
-        const actionBtns = p.status === 'pending'
-            ? `<button class="btn-complete" onclick="updatePayoutStatus(${p.payoutId}, 'completed')">Mark complete</button>
-               <button class="btn-cancel-payout" onclick="updatePayoutStatus(${p.payoutId}, 'cancelled')">Cancel</button>`
-            : '—';
+//     const rows = payouts.map(p => {
+//         const actionBtns = p.status === 'pending'
+//             ? `<button class="btn-complete" onclick="updatePayoutStatus(${p.payoutId}, 'completed')">Mark complete</button>
+//                <button class="btn-cancel-payout" onclick="updatePayoutStatus(${p.payoutId}, 'cancelled')">Cancel</button>`
+//             : '—';
 
-        return `
-            <tr>
-                <td><strong style="color:#034e52;">${sanitise(p.recipientName)}</strong></td>
-                <td style="font-weight:700;color:#034e52;">${formatCurrency(p.amount)}</td>
-                <td>Cycle ${p.cycleNumber}</td>
-                <td><span class="status-pill ${p.status}">${p.status.charAt(0).toUpperCase() + p.status.slice(1)}</span></td>
-                <td>${formatDateTime(p.initiatedAt)}</td>
-                <td class="ref-text">${sanitise(p.transactionRef || '—')}</td>
-                <td>${actionBtns}</td>
-            </tr>
-        `;
-    }).join('');
+//         return `
+//             <tr>
+//                 <td><strong style="color:#034e52;">${sanitise(p.recipientName)}</strong></td>
+//                 <td style="font-weight:700;color:#034e52;">${formatCurrency(p.amount)}</td>
+//                 <td>Cycle ${p.cycleNumber}</td>
+//                 <td><span class="status-pill ${p.status}">${p.status.charAt(0).toUpperCase() + p.status.slice(1)}</span></td>
+//                 <td>${formatDateTime(p.initiatedAt)}</td>
+//                 <td class="ref-text">${sanitise(p.transactionRef || '—')}</td>
+//                 <td>${actionBtns}</td>
+//             </tr>
+//         `;
+//     }).join('');
 
-    container.innerHTML = `
-        <table class="payouts-table">
-            <thead>
-                <tr>
-                    <th>Recipient</th>
-                    <th>Amount</th>
-                    <th>Cycle</th>
-                    <th>Status</th>
-                    <th>Initiated</th>
-                    <th>Reference</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>${rows}</tbody>
-        </table>
-    `;
-}
+//     container.innerHTML = `
+//         <table class="payouts-table">
+//             <thead>
+//                 <tr>
+//                     <th>Recipient</th>
+//                     <th>Amount</th>
+//                     <th>Cycle</th>
+//                     <th>Status</th>
+//                     <th>Initiated</th>
+//                     <th>Reference</th>
+//                     <th>Actions</th>
+//                 </tr>
+//             </thead>
+//             <tbody>${rows}</tbody>
+//         </table>
+//     `;
+// }
 
-// Load payout history
-async function loadPayouts() {
-    if (!currentGroup) return;
-    try {
-        const token = await auth0Client.getTokenSilently();
-        const response = await fetch(`${config.apiBase}/api/payouts/group/${currentGroup.groupId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (!response.ok) throw new Error(`Server error: ${response.status}`);
-        const payouts = await response.json();
-        renderPayouts(payouts);
-    } catch (err) {
-        console.error('Error loading payouts:', err);
-        document.getElementById('payouts-container').innerHTML =
-            '<p class="empty-payouts">Error loading payout history.</p>';
-    }
-}
+// // Load payout history
+// async function loadPayouts() {
+//     if (!currentGroup) return;
+//     try {
+//         const token = await auth0Client.getTokenSilently();
+//         const response = await fetch(`${config.apiBase}/api/payouts/group/${currentGroup.groupId}`, {
+//             headers: { 'Authorization': `Bearer ${token}` }
+//         });
+//         if (!response.ok) throw new Error(`Server error: ${response.status}`);
+//         const payouts = await response.json();
+//         renderPayouts(payouts);
+//     } catch (err) {
+//         console.error('Error loading payouts:', err);
+//         document.getElementById('payouts-container').innerHTML =
+//             '<p class="empty-payouts">Error loading payout history.</p>';
+//     }
+// }
 
-// Initiate payout
-async function initiatePayout() {
-    const select = document.getElementById('payout-recipient');
-    const cycleInput = document.getElementById('payout-cycle');
-    const notes = document.getElementById('payout-notes').value.trim();
-    const btn = document.getElementById('btn-initiate-payout');
+// // Initiate payout
+// async function initiatePayout() {
+//     const select = document.getElementById('payout-recipient');
+//     const cycleInput = document.getElementById('payout-cycle');
+//     const notes = document.getElementById('payout-notes').value.trim();
+//     const btn = document.getElementById('btn-initiate-payout');
 
-    const recipientId = select.value;
-    const recipientName = select.options[select.selectedIndex]?.dataset.name || '';
-    const cycleNumber = cycleInput.value;
+//     const recipientId = select.value;
+//     const recipientName = select.options[select.selectedIndex]?.dataset.name || '';
+//     const cycleNumber = cycleInput.value;
 
-    // Validate
-    if (!recipientId) {
-        showFeedback('payout-feedback', 'Please select a recipient.', 'error');
-        return;
-    }
+//     // Validate
+//     if (!recipientId) {
+//         showFeedback('payout-feedback', 'Please select a recipient.', 'error');
+//         return;
+//     }
 
-    if (!cycleNumber || parseInt(cycleNumber) < 1) {
-        showFeedback('payout-feedback', 'Please enter a valid cycle number.', 'error');
-        return;
-    }
+//     if (!cycleNumber || parseInt(cycleNumber) < 1) {
+//         showFeedback('payout-feedback', 'Please enter a valid cycle number.', 'error');
+//         return;
+//     }
 
-    const amount = currentGroup.contributionAmount * currentGroup.totalMembers;
+//     const amount = currentGroup.contributionAmount * currentGroup.totalMembers;
 
-    // Show confirm modal
-    document.getElementById('confirm-modal-body').textContent =
-        `You are about to initiate a payout of ${formatCurrency(amount)} to ${recipientName} for Cycle ${cycleNumber}. This action will be recorded and cannot be undone.`;
-    document.getElementById('confirm-modal').hidden = false;
+//     // Show confirm modal
+//     document.getElementById('confirm-modal-body').textContent =
+//         `You are about to initiate a payout of ${formatCurrency(amount)} to ${recipientName} for Cycle ${cycleNumber}. This action will be recorded and cannot be undone.`;
+//     document.getElementById('confirm-modal').hidden = false;
 
-    // Handle confirm
-    document.getElementById('modal-confirm-btn').onclick = async () => {
-        document.getElementById('confirm-modal').hidden = true;
-        btn.disabled = true;
-        btn.textContent = 'Initiating...';
-        document.getElementById('payout-feedback').hidden = true;
+//     // Handle confirm
+//     document.getElementById('modal-confirm-btn').onclick = async () => {
+//         document.getElementById('confirm-modal').hidden = true;
+//         btn.disabled = true;
+//         btn.textContent = 'Initiating...';
+//         document.getElementById('payout-feedback').hidden = true;
 
-        try {
-            const token = await auth0Client.getTokenSilently();
-            const response = await fetch(`${config.apiBase}/api/payouts`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    groupId: currentGroup.groupId,
-                    recipientId: parseInt(recipientId),
-                    recipientName,
-                    amount,
-                    cycleNumber: parseInt(cycleNumber),
-                    notes: notes || null
-                })
-            });
+//         try {
+//             const token = await auth0Client.getTokenSilently();
+//             const response = await fetch(`${config.apiBase}/api/payouts`, {
+//                 method: 'POST',
+//                 headers: {
+//                     'Content-Type': 'application/json',
+//                     'Authorization': `Bearer ${token}`
+//                 },
+//                 body: JSON.stringify({
+//                     groupId: currentGroup.groupId,
+//                     recipientId: parseInt(recipientId),
+//                     recipientName,
+//                     amount,
+//                     cycleNumber: parseInt(cycleNumber),
+//                     notes: notes || null
+//                 })
+//             });
 
-            const data = await response.json();
+//             const data = await response.json();
 
-            if (response.ok) {
-                showFeedback('payout-feedback',
-                    `Payout of ${formatCurrency(amount)} to ${recipientName} initiated successfully. Ref: ${data.payout.transactionRef}`,
-                    'success'
-                );
-                // Reset form
-                select.value = '';
-                cycleInput.value = '';
-                document.getElementById('payout-notes').value = '';
-                // Reload payout history
-                await loadPayouts();
-            } else {
-                showFeedback('payout-feedback', data.error || 'Failed to initiate payout.', 'error');
-            }
-        } catch (err) {
-            console.error('Payout error:', err);
-            showFeedback('payout-feedback', 'Something went wrong. Please try again.', 'error');
-        } finally {
-            btn.disabled = false;
-            btn.textContent = 'Initiate Payout';
-        }
-    };
-}
+//             if (response.ok) {
+//                 showFeedback('payout-feedback',
+//                     `Payout of ${formatCurrency(amount)} to ${recipientName} initiated successfully. Ref: ${data.payout.transactionRef}`,
+//                     'success'
+//                 );
+//                 // Reset form
+//                 select.value = '';
+//                 cycleInput.value = '';
+//                 document.getElementById('payout-notes').value = '';
+//                 // Reload payout history
+//                 await loadPayouts();
+//             } else {
+//                 showFeedback('payout-feedback', data.error || 'Failed to initiate payout.', 'error');
+//             }
+//         } catch (err) {
+//             console.error('Payout error:', err);
+//             showFeedback('payout-feedback', 'Something went wrong. Please try again.', 'error');
+//         } finally {
+//             btn.disabled = false;
+//             btn.textContent = 'Initiate Payout';
+//         }
+//     };
+// }
 
-// Update payout status
-async function updatePayoutStatus(payoutId, status) {
-    try {
-        const token = await auth0Client.getTokenSilently();
-        const response = await fetch(`${config.apiBase}/api/payouts/${payoutId}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ status })
-        });
+// // Update payout status
+// async function updatePayoutStatus(payoutId, status) {
+//     try {
+//         const token = await auth0Client.getTokenSilently();
+//         const response = await fetch(`${config.apiBase}/api/payouts/${payoutId}`, {
+//             method: 'PATCH',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'Authorization': `Bearer ${token}`
+//             },
+//             body: JSON.stringify({ status })
+//         });
 
-        if (response.ok) {
-            await loadPayouts();
-        } else {
-            const data = await response.json();
-            alert(data.error || 'Failed to update payout status.');
-        }
-    } catch (err) {
-        console.error('Error updating payout:', err);
-        alert('Something went wrong. Please try again.');
-    }
-}
+//         if (response.ok) {
+//             await loadPayouts();
+//         } else {
+//             const data = await response.json();
+//             alert(data.error || 'Failed to update payout status.');
+//         }
+//     } catch (err) {
+//         console.error('Error updating payout:', err);
+//         alert('Something went wrong. Please try again.');
+//     }
+// }
 
 // Payment functions
 async function fetchPaymentStatus(userId, groupId) {

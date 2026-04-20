@@ -265,13 +265,13 @@
 
 /* ── Payout history table ── */
 
-.payouts-table {
+/* .payouts-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
-}
+} */
 
-.payouts-table th {
+/* .payouts-table th {
   text-align: left;
   padding: 8px 12px;
   font-size: 11px;
@@ -306,7 +306,7 @@
   font-style: italic;
   margin: 0;
 }
-
+ */
 
 /* ── Status pills ── */
 
@@ -326,7 +326,7 @@
 
 
 /* ── Payout action buttons ── */
-
+/* 
 .btn-complete {
   padding: 5px 12px;
   background: #dcfce7;
@@ -356,7 +356,7 @@
   transition: background 0.15s ease;
 }
 
-.btn-cancel-payout:hover { background: #fecaca; }
+.btn-cancel-payout:hover { background: #fecaca; } */
 
 
 /* ── Group stats strip ── */
