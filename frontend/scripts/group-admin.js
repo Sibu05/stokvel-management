@@ -422,6 +422,101 @@ async function loadGroupData() {
 }
 
 
+
+// ─── View payouts modal ───────────────────────────────────────────────────────
+
+async function fetchPayouts(groupId) {
+    const token    = await auth0Client.getTokenSilently();
+    const response = await fetch(`${config.apiBase}/api/payouts/group/${groupId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error('Failed to fetch payouts');
+    return await response.json();
+}
+
+async function loadAndShowPayouts(groupId) {
+    const userId = parseInt(localStorage.getItem('userId'));
+
+    if (!groupId) { alert('No group selected. Please refresh the page.'); return; }
+
+    let modal = document.getElementById('payouts-modal');
+    if (!modal) {
+        modal           = document.createElement('aside');
+        modal.id        = 'payouts-modal';
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <article class="modal">
+                <header class="modal-header">
+                    <h2 class="modal-title">Payout schedule</h2>
+                    <button class="modal-close" aria-label="Close payouts">&#x2715;</button>
+                </header>
+                <section id="payouts-content" class="modal-section"></section>
+            </article>
+        `;
+        document.body.appendChild(modal);
+        modal.querySelector('.modal-close').addEventListener('click', () => { modal.hidden = true; });
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.hidden = true; });
+    }
+
+    const content = document.getElementById('payouts-content');
+    content.innerHTML = '<p style="text-align:center;padding:1.5rem;color:#64748b;">Loading...</p>';
+    modal.hidden = false;
+
+    try {
+        const payouts = await fetchPayouts(groupId);
+
+        if (!payouts || payouts.length === 0) {
+            content.innerHTML = '<p style="text-align:center;padding:2rem;color:#64748b;font-style:italic;">No payouts recorded for this group yet.</p>';
+            return;
+        }
+
+        let html = `
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                <thead>
+                    <tr style="border-bottom:1.5px solid #e0f7f6;">
+                        <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Member</th>
+                        <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Date</th>
+                        <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Amount</th>
+                        <th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        payouts.forEach(p => {
+            const isMe      = p.recipientId === userId;
+            const name      = isMe ? 'You' : (p.recipientName || p.recipient?.name || '\u2014');
+            const date      = p.initiatedAt
+                ? new Date(p.initiatedAt).toLocaleDateString('en-ZA', { day:'numeric', month:'long', year:'numeric' })
+                : '\u2014';
+            const amount    = new Intl.NumberFormat('en-ZA', { style:'currency', currency:'ZAR', minimumFractionDigits:2 }).format(p.amount);
+            const statusTxt = p.status.charAt(0).toUpperCase() + p.status.slice(1);
+            const rowBg     = isMe ? 'background:#e0f7f6;' : 'background:white;';
+
+            let statusBg = '#e0f7f6', statusColor = '#034e52';
+            if (p.status === 'pending')   { statusBg = '#fef3c7'; statusColor = '#b45309'; }
+            if (p.status === 'cancelled') { statusBg = '#fef2f2'; statusColor = '#991b1b'; }
+
+            html += `
+                <tr style="${rowBg}border-bottom:1px solid #f0fafa;">
+                    <td style="padding:11px 12px;font-weight:${isMe ? '700' : '400'};color:#0f172a;">${name}</td>
+                    <td style="padding:11px 12px;color:#0f172a;">${date}</td>
+                    <td style="padding:11px 12px;color:#0f172a;">${amount}</td>
+                    <td style="padding:11px 12px;">
+                        <span style="background:${statusBg};color:${statusColor};padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;">${statusTxt}</span>
+                    </td>
+                </tr>
+            `;
+        });
+
+        html += '</tbody></table>';
+        content.innerHTML = html;
+
+    } catch (error) {
+        content.innerHTML = `<p style="text-align:center;padding:2rem;color:#991b1b;">Could not load payouts: ${error.message}</p>`;
+    }
+}
+
 // ─── Contribution history ─────────────────────────────────────────────────────
 
 async function loadAndShowContributions() {
@@ -557,6 +652,12 @@ function setupEventListeners() {
     if (treasurerEmail)     treasurerEmail.addEventListener('keydown', (e) => { if (e.key === 'Enter') assignTreasurer(); });
 
     if (viewContribBtn) viewContribBtn.addEventListener('click', loadAndShowContributions);
+
+    const viewPayoutsBtn = document.getElementById('view-payouts-btn');
+    if (viewPayoutsBtn) viewPayoutsBtn.addEventListener('click', () => {
+        const groupId = new URLSearchParams(window.location.search).get('groupId');
+        loadAndShowPayouts(groupId);
+    });
 
     if (payNowBtn)   payNowBtn.addEventListener('click', handlePayNow);
     if (closePayBtn) closePayBtn.addEventListener('click', closePaymentModal);
