@@ -32,7 +32,7 @@
 }
 
 
-/* ── Add member / assign treasurer form (horizontal row) ── */
+/* ── Add member / assign treasurer form ── */
 
 .add-member-form {
   display: flex;
@@ -42,8 +42,7 @@
   margin-top: 10px;
 }
 
-.add-member-form input[type="email"],
-.add-member-form input[type="text"] {
+.add-member-form input {
   flex: 1;
   min-width: 200px;
   padding: 9px 12px;
@@ -57,98 +56,12 @@
   background: white;
 }
 
-.add-member-form input[type="email"]:focus,
-.add-member-form input[type="text"]:focus {
+.add-member-form input:focus {
   border-color: #0e9490;
   box-shadow: 0 0 0 3px rgba(14, 148, 144, 0.1);
 }
 
 .add-member-form input.input-error { border-color: #ef4444; }
-
-
-/* ── Payout form (vertical column layout) ── */
-
-.payout-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 10px;
-}
-
-.payout-form label {
-  font-size: 11px;
-  font-weight: 700;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.payout-form label small {
-  font-size: 10px;
-  font-weight: 400;
-  text-transform: none;
-  letter-spacing: 0;
-  color: #94a3b8;
-}
-
-.payout-form select,
-.payout-form input[type="number"] {
-  width: 100%;
-  padding: 9px 12px;
-  border: 1.5px solid rgba(14, 148, 144, 0.25);
-  border-radius: 8px;
-  font-size: 14px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #0f172a;
-  background: white;
-  outline: none;
-  box-sizing: border-box;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.payout-form select:focus,
-.payout-form input[type="number"]:focus,
-.payout-form textarea:focus {
-  border-color: #0e9490;
-  box-shadow: 0 0 0 3px rgba(14, 148, 144, 0.1);
-}
-
-.payout-form textarea {
-  width: 100%;
-  padding: 9px 12px;
-  border: 1.5px solid rgba(14, 148, 144, 0.25);
-  border-radius: 8px;
-  font-size: 14px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #0f172a;
-  background: white;
-  outline: none;
-  box-sizing: border-box;
-  resize: vertical;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-
-/* ── Payout amount preview ── */
-
-.payout-amount-preview {
-  font-size: 13px;
-  color: #64748b;
-  margin: 0;
-  padding: 10px 14px;
-  background: #f0fafa;
-  border-radius: 8px;
-  border: 1px solid #e0f7f6;
-}
-
-.payout-amount-preview strong {
-  font-size: 18px;
-  font-weight: 700;
-  color: #034e52;
-}
-
-
-/* ── Shared button ── */
 
 .btn-add {
   padding: 9px 20px;
@@ -163,23 +76,17 @@
   white-space: nowrap;
   box-shadow: 0 2px 8px rgba(14, 148, 144, 0.3);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  align-self: flex-start;
 }
 
 .btn-add:hover    { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(14, 148, 144, 0.4); }
 .btn-add:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-
-/* ── Form feedback ── */
-
 .form-feedback {
-  display: block;
   width: 100%;
   font-size: 13px;
   padding: 8px 12px;
   border-radius: 8px;
   margin-top: 4px;
-  box-sizing: border-box;
 }
 
 .form-feedback.success { background: #e0f7f6; color: #034e52; border-left: 3px solid #0e9490; }
@@ -220,7 +127,7 @@
   align-items: center;
   gap: 10px;
 }
-/* Useless */
+
 .member-initials {
   width: 32px;
   height: 32px;
@@ -261,102 +168,6 @@
   font-size: 13px;
   font-style: italic;
 }
-
-
-/* ── Payout history table ── */
-
-/* .payouts-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-} */
-
-/* .payouts-table th {
-  text-align: left;
-  padding: 8px 12px;
-  font-size: 11px;
-  font-weight: 700;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 1.5px solid #e0f7f6;
-}
-
-.payouts-table td {
-  padding: 11px 12px;
-  border-bottom: 1px solid #f0fafa;
-  color: #0f172a;
-  vertical-align: middle;
-}
-
-.payouts-table tr:last-child td { border-bottom: none; }
-.payouts-table tr:hover td      { background: #f0fafa; }
-
-.ref-text {
-  font-size: 11px;
-  font-family: 'Courier New', Courier, monospace;
-  color: #64748b;
-}
-
-.empty-payouts {
-  text-align: center;
-  padding: 2rem;
-  color: #64748b;
-  font-size: 13px;
-  font-style: italic;
-  margin: 0;
-}
- */
-
-/* ── Status pills ── */
-
-.status-pill {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.status-pill.paid      { background: #2b7e3a20; color: #2b7e3a; }
-.status-pill.pending   { background: #ff980020; color: #b45309; }
-.status-pill.missed    { background: #f4433620; color: #991b1b; }
-.status-pill.completed { background: #2b7e3a20; color: #2b7e3a; }
-.status-pill.cancelled { background: #94a3b820; color: #64748b; }
-
-
-/* ── Payout action buttons ── */
-/* 
-.btn-complete {
-  padding: 5px 12px;
-  background: #dcfce7;
-  color: #166534;
-  border: 1.5px solid #bbf7d0;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  transition: background 0.15s ease;
-  margin-right: 6px;
-}
-
-.btn-complete:hover { background: #bbf7d0; }
-
-.btn-cancel-payout {
-  padding: 5px 12px;
-  background: #fee2e2;
-  color: #991b1b;
-  border: 1.5px solid #fecaca;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  transition: background 0.15s ease;
-}
-
-.btn-cancel-payout:hover { background: #fecaca; } */
 
 
 /* ── Group stats strip ── */
@@ -421,5 +232,5 @@ hr.strip-divider {
 /* ── Fix browser defaults ── */
 
 i.logo-mark, i.member-initials, address.header-avatar { font-style: normal; }
-figure.header-logo                                     { margin: 0; }
-b.badge, b.admin-badge                                 { font-weight: inherit; }
+figure.header-logo { margin: 0; }
+b.badge, b.admin-badge { font-weight: inherit; }
