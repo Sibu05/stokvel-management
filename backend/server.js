@@ -57,30 +57,6 @@ app.get('/api/auth/me', requireAuth, (req, res) => {
     res.json({ userId: req.user.userId, name: req.user.name, email: req.user.email });
 });
 
-app.post('/api/auth/register', async (req, res) => {
-    const { email, name, providerId } = req.body;
-    try {
-        const newUser = await prisma.users.create({
-            data: { providerId, email, name, createdAt: new Date() }
-        });
-        res.status(201).json(newUser);
-    } catch (error) {
-        console.error(error);
-        res.status(400).json({ error: "Failed to create user", details: error.message });
-    }
-});
-
-app.post('/api/auth/login', async (req, res) => {
-    const { email } = req.body;
-    try {
-        const user = await prisma.users.findUnique({ where: { email } });
-        if (user) return res.json(user);
-        res.status(404).json({ error: 'User not found' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
 app.get('/api/users', async (req, res) => {
     try {
         const users = await prisma.users.findMany();
@@ -227,59 +203,6 @@ app.post('/api/groups/add-member', async (req, res) => {
     }
 });
 
-// Create invite
-app.post('/api/invites', async (req, res) => {
-    const { groupId, email, createdBy } = req.body;
-    if (!groupId || !email || !createdBy) {
-        return res.status(400).json({ error: 'Missing required fields', required: ['groupId', 'email', 'createdBy'] });
-    }
-    if (!email.includes('@')) return res.status(400).json({ error: 'Invalid email format' });
-
-    try {
-        const group = await prisma.groups.findUnique({ where: { groupId: parseInt(groupId) } });
-        if (!group) return res.status(404).json({ error: 'Group not found' });
-
-        const user = await prisma.users.findUnique({ where: { userId: parseInt(createdBy) } });
-        if (!user) return res.status(404).json({ error: 'User not found' });
-
-        const token = crypto.randomBytes(32).toString('hex');
-        const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + 7);
-
-        const newInvite = await prisma.group_invites.create({
-            data: { SFKgroupId: parseInt(groupId), token, email, createdBy: parseInt(createdBy), expiresAt, status: 'active' }
-        });
-        res.status(201).json({ message: 'Invite sent successfully', invite: newInvite });
-    } catch (error) {
-        res.status(400).json({ error: 'Failed to create invite', details: error.message });
-    }
-});
-
-// Join via invite token
-app.post('/api/invites/join', async (req, res) => {
-    const { token, userId } = req.body;
-    if (!token || !userId) {
-        return res.status(400).json({ error: 'Missing required fields', required: ['token', 'userId'] });
-    }
-    try {
-        const invite = await prisma.group_invites.findUnique({ where: { token } });
-        if (!invite) return res.status(404).json({ error: 'Invalid invite token' });
-        if (invite.expiresAt < new Date()) return res.status(400).json({ error: 'Invite has expired' });
-        if (invite.status !== 'active') return res.status(400).json({ error: 'Invite has been revoked' });
-
-        const existingMember = await prisma.group_members.findFirst({
-            where: { FgroupId: invite.SFKgroupId, SuserId: parseInt(userId) }
-        });
-        if (existingMember) return res.status(400).json({ error: 'User is already a member of this group' });
-
-        const newMember = await prisma.group_members.create({
-            data: { FgroupId: invite.SFKgroupId, SuserId: parseInt(userId), role: 'member', joinedAt: new Date() }
-        });
-        res.status(201).json({ message: 'Successfully joined the group', member: newMember });
-    } catch (error) {
-        res.status(400).json({ error: 'Failed to join group', details: error.message });
-    }
-});
 
 app.post('/api/contributions', async (req, res) => {
     const { userId, groupId, amount, treasurerId, paidAt } = req.body;
