@@ -370,6 +370,17 @@ async function handleScheduleMeeting(e) {
         showFeedback('meeting-feedback', 'Meeting date and time must be in the future.', 'error');
         return;
     }
+
+    //This is to check the length of the tittle if it is more than 100 characters, it will show an error message.
+    if (titleInput.value.trim().length > 100) {
+        showFeedback('meeting-feedback', 'Meeting title cannot exceed 100 characters.', 'error');
+        return;
+    }
+    //This checks the lenght of the agenda if it is more than 500 characters, it will show an error message.
+    if (agendaInput.value.trim().length > 500) {
+        showFeedback('meeting-feedback', 'Meeting agenda cannot exceed 500 characters.', 'error');
+        return;
+    }
     // Prepare data
     const meetingData = {
         groupId: currentGroup.groupId,
