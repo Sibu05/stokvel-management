@@ -364,7 +364,12 @@ async function handleScheduleMeeting(e) {
         showFeedback('meeting-feedback', 'Group information not loaded. Please refresh.', 'error');
         return;
     }
-
+    //This is to check if the selected date and time is in the past.
+    //It combines the date and time inputs into a single Date object and compares it to the current date and time.
+    if (new Date(`${dateInput.value}T${timeInput.value}`) < new Date()) {
+        showFeedback('meeting-feedback', 'Meeting date and time must be in the future.', 'error');
+        return;
+    }
     // Prepare data
     const meetingData = {
         groupId: currentGroup.groupId,
