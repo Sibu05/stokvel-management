@@ -1,11 +1,11 @@
-name: Deploy Stokvel App
+# name: Deploy Stokvel App
 
-on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main]
-  workflow_dispatch:
+# on:
+#   push:
+#     branches: [main, develop]
+#   pull_request:
+#     branches: [main]
+#   workflow_dispatch:
 
 env:
   NODE_VERSION: "22.x"
@@ -31,13 +31,15 @@ jobs:
             echo "❌ DATABASE_URL secret is EMPTY"
           fi
 
-      - name: Install dependencies
-        run: npm ci
+    - name: Install dependencies
+      run: npm install
+      working-directory: ./backend
 
-      - name: Generate Prisma client
-        run: npx prisma generate
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    - name: Generate Prisma client
+      run: npx prisma generate
+      working-directory: ./backend
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Security audit
         run: npm audit --production --audit-level=moderate || echo "Security issues found but continuing"
