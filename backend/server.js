@@ -527,10 +527,6 @@ app.post('/api/meetings', requireAuth, async (req, res) => {
     }
 });
 
-app.get(/.*/, (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'frontend', 'pages', 'index.html'));
-});
-
 // This api aggregates contribution data per member and calculates compliance rates.
 app.get('/api/groups/:groupId/compliance-report', requireAuth, async(req, res) =>{
     const { groupId } = req.params;
@@ -605,6 +601,11 @@ app.get('/api/groups/:groupId/compliance-report', requireAuth, async(req, res) =
         res.status(500).json({ error: 'Failed to generate compliance report', details: error.message });
     }
 })
+
+app.get(/.*/, (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'frontend', 'pages', 'index.html'));
+});
+
 
 // Only start server when run directly, not when imported by tests
 if (require.main === module) {

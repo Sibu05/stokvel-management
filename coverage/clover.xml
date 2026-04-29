@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1777482128970" clover="3.2.0">
-  <project timestamp="1777482128973" name="All files">
-    <metrics statements="295" coveredstatements="171" conditionals="131" coveredconditionals="62" methods="36" coveredmethods="18" elements="462" coveredelements="251" complexity="0" loc="295" ncloc="295" packages="2" files="2" classes="2"/>
+<coverage generated="1777488705684" clover="3.2.0">
+  <project timestamp="1777488705685" name="All files">
+    <metrics statements="324" coveredstatements="204" conditionals="150" coveredconditionals="78" methods="43" coveredmethods="26" elements="517" coveredelements="308" complexity="0" loc="324" ncloc="324" packages="2" files="2" classes="2"/>
     <package name="backend">
-      <metrics statements="278" coveredstatements="154" conditionals="121" coveredconditionals="52" methods="34" coveredmethods="16"/>
+      <metrics statements="307" coveredstatements="187" conditionals="140" coveredconditionals="68" methods="41" coveredmethods="24"/>
       <file name="server.js" path="/mnt/c/dev/Stokvel/stokvel-management/backend/server.js">
-        <metrics statements="278" coveredstatements="154" conditionals="121" coveredconditionals="52" methods="34" coveredmethods="16"/>
+        <metrics statements="307" coveredstatements="187" conditionals="140" coveredconditionals="68" methods="41" coveredmethods="24"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
         <line num="4" count="1" type="stmt"/>
@@ -229,10 +229,10 @@
         <line num="438" count="0" type="stmt"/>
         <line num="439" count="0" type="stmt"/>
         <line num="445" count="1" type="stmt"/>
-        <line num="446" count="0" type="stmt"/>
-        <line num="447" count="0" type="stmt"/>
-        <line num="448" count="0" type="stmt"/>
-        <line num="452" count="0" type="stmt"/>
+        <line num="446" count="1" type="stmt"/>
+        <line num="447" count="1" type="stmt"/>
+        <line num="448" count="1" type="stmt"/>
+        <line num="452" count="1" type="stmt"/>
         <line num="454" count="0" type="stmt"/>
         <line num="455" count="0" type="stmt"/>
         <line num="459" count="1" type="stmt"/>
@@ -276,14 +276,43 @@
         <line num="523" count="1" type="stmt"/>
         <line num="525" count="0" type="stmt"/>
         <line num="526" count="0" type="stmt"/>
-        <line num="530" count="1" type="stmt"/>
-        <line num="531" count="0" type="stmt"/>
-        <line num="535" count="1" type="cond" truecount="1" falsecount="1"/>
-        <line num="536" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="537" count="0" type="stmt"/>
-        <line num="538" count="0" type="stmt"/>
-        <line num="539" count="0" type="stmt"/>
-        <line num="543" count="1" type="stmt"/>
+        <line num="531" count="1" type="stmt"/>
+        <line num="532" count="4" type="stmt"/>
+        <line num="533" count="4" type="stmt"/>
+        <line num="536" count="4" type="stmt"/>
+        <line num="537" count="4" type="stmt"/>
+        <line num="540" count="4" type="cond" truecount="4" falsecount="0"/>
+        <line num="541" count="1" type="stmt"/>
+        <line num="544" count="3" type="stmt"/>
+        <line num="548" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="550" count="1" type="stmt"/>
+        <line num="555" count="1" type="stmt"/>
+        <line num="562" count="1" type="stmt"/>
+        <line num="564" count="1" type="stmt"/>
+        <line num="565" count="4" type="stmt"/>
+        <line num="566" count="2" type="stmt"/>
+        <line num="567" count="2" type="stmt"/>
+        <line num="568" count="2" type="stmt"/>
+        <line num="569" count="2" type="cond" truecount="1" falsecount="1"/>
+        <line num="570" count="2" type="stmt"/>
+        <line num="572" count="2" type="stmt"/>
+        <line num="573" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="574" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="576" count="2" type="stmt"/>
+        <line num="585" count="1" type="stmt"/>
+        <line num="586" count="2" type="stmt"/>
+        <line num="587" count="1" type="stmt"/>
+        <line num="589" count="1" type="stmt"/>
+        <line num="600" count="1" type="stmt"/>
+        <line num="601" count="1" type="stmt"/>
+        <line num="605" count="1" type="stmt"/>
+        <line num="606" count="0" type="stmt"/>
+        <line num="611" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="612" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="613" count="0" type="stmt"/>
+        <line num="614" count="0" type="stmt"/>
+        <line num="615" count="0" type="stmt"/>
+        <line num="619" count="1" type="stmt"/>
       </file>
     </package>
     <package name="backend.src.middleware">
