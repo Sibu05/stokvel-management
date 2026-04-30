@@ -17,7 +17,7 @@ function renderFooterButtons(group) {
 
 async function fetchMeetings(groupId) {
     const token    = await auth0Client.getTokenSilently();
-    const response = await fetch(`${config.apiBase}/api/meeting/group/${groupId}`, {
+    const response = await fetch(`${config.apiBase}/api/meetings/group/${groupId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
     });
     if (!response.ok) throw new Error('Failed to fetch meetings');

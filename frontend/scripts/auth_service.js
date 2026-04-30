@@ -7,7 +7,7 @@ const configureClient = async () => {
         authorizationParams: {
             audience: config.audience,
             // Always redirect back to the login page after Auth0 login
-            redirect_uri: window.location.origin + "/pages/index.html",
+            redirect_uri: window.location.origin + "/stokvel-management/frontend/pages/index.html",
             scope: "openid profile email"
         },
         useRefreshTokens: true,
@@ -54,7 +54,7 @@ const processLoginState = async () => {
             localStorage.setItem("userName", dbUser.name);
 
             // Use absolute path so this works regardless of which page we're on
-            window.location.href = window.location.origin + "/pages/dashboard.html";
+            window.location.href = window.location.origin + "/stokvel-management/frontend/pages/dashboard.html";
         }
     }
 };

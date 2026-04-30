@@ -527,7 +527,7 @@ app.post('/api/meetings', requireAuth, async (req, res) => {
     }
 });
 //An api to fetch meetings
-app.get('/api/meeting/group/:groupId', requireAuth, async (req, res) => {
+app.get('/api/meetings/group/:groupId', requireAuth, async (req, res) => {
     const { groupId } = req.params;
     const userId = req.user.userId;
 
