@@ -68,7 +68,7 @@ async function loadAndShowNotifications(groupId) {
         const meetings = await fetchMeetings(groupId);
 
         if (!meetings || meetings.length === 0) {
-            content.innerHTML = '<p style="text-align:center;padding:2rem;color:#64748b;font-style:italic;">No payouts recorded for this group yet.</p>';
+            content.innerHTML = '<p style="text-align:center;padding:2rem;color:#64748b;font-style:italic;">No upcoming meetings scheduled for this group.</p>';
             return;
         }
 
