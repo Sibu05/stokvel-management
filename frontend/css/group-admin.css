@@ -234,3 +234,35 @@ hr.strip-divider {
 i.logo-mark, i.member-initials, address.header-avatar { font-style: normal; }
 figure.header-logo { margin: 0; }
 b.badge, b.admin-badge { font-weight: inherit; }
+
+/* Container for the notification badge */
+.badge-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* The red dot indicator for a new notification*/
+.has-notification::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 12px;
+  height: 12px;
+  background-color: #ef4444; /* Bright Red */
+  border: 2px solid white;
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+  z-index: 10;
+}
+
+
+.has-notification::after {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { transform: scale(1.2); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}

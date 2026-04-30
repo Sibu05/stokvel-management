@@ -1,3 +1,5 @@
+const groupSelect = { value: new URLSearchParams(window.location.search).get('groupId') };
+
 // State
 let currentGroup = null;
 
@@ -408,6 +410,8 @@ async function loadGroupData() {
         currentGroup = group;
         renderGroupHeader(group);
         renderMembers(group.members);
+
+        renderFooterButtons(group);
 
         // Fetch and render the admin's own payment status for this group
         const statusData = await fetchPaymentStatus(parseInt(userId), parseInt(groupId));

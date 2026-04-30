@@ -1,6 +1,5 @@
 function renderFooterButtons(group) {
   const footer   = document.querySelector(".action-footer");
-  
 
   footer.innerHTML = ""; // clear existing buttons
   // Everyone gets Notifications
@@ -9,8 +8,8 @@ function renderFooterButtons(group) {
   viewNotificationsBtn.id          = "view-notifications-btn";
   viewNotificationsBtn.textContent = "Notifications";
   viewNotificationsBtn.addEventListener("click", () => {
-    loadAndShowNotifications(groupSelect.value);
-  });
+    loadAndShowNotifications(group.groupId); 
+    });
   footer.appendChild(viewNotificationsBtn);
 
 }
