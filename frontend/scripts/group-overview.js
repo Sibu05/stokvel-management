@@ -379,52 +379,59 @@ function renderMembers(members) {
 // Shows different buttons depending on whether user is admin, treasurer, or member
 
 function renderFooterButtons(group) {
-  const footer   = document.querySelector(".action-footer");
-  const userRole = group.userRole; // 'admin', 'treasurer', or 'member'
+  const footer = document.querySelector(".action-footer");
+  if (!footer) return;
 
-  footer.innerHTML = ""; // clear existing buttons
+  footer.innerHTML = ""; // Clear everything to prevent duplicates
 
-  // Everyone gets View contributions
+  //View Contributions Button
   const viewContribBtn = document.createElement("button");
-  viewContribBtn.id          = "view-contributions-btn";
+  viewContribBtn.id = "view-contributions-btn";
   viewContribBtn.textContent = "View contributions";
   viewContribBtn.addEventListener("click", loadAndShowContributions);
   footer.appendChild(viewContribBtn);
 
-  // Everyone gets View payouts
+  //View Payouts Button
   const viewPayoutsBtn = document.createElement("button");
-  viewPayoutsBtn.id          = "view-payouts-btn";
+  viewPayoutsBtn.id = "view-payouts-btn";
   viewPayoutsBtn.textContent = "View payouts";
   viewPayoutsBtn.addEventListener("click", () => {
-    loadAndShowPayouts(groupSelect.value);
+    // Falls back to URL param if groupSelect isn't available (common on Admin/Treasurer pages)
+    const gid = group?.groupId || new URLSearchParams(window.location.search).get('groupId');
+    loadAndShowPayouts(gid);
   });
   footer.appendChild(viewPayoutsBtn);
 
-  // Admin gets: go to admin dashboard
-  if (userRole === "admin") {
-    const adminBtn = document.createElement("button");
-    adminBtn.id          = "admin-btn";
-    adminBtn.textContent = "Admin dashboard";
-    adminBtn.addEventListener("click", () => {
-      window.location.href = `group-admin.html?groupId=${group.groupId}`;
-    });
-    footer.appendChild(adminBtn);
-  }
+  //Notifications Button with Badge Container
+  const badgeWrapper = document.createElement("div");
+  badgeWrapper.className = "badge-container"; 
 
-  // Treasurer gets: go to treasurer portal where payouts are initiated
-  if (userRole === "treasurer") {
-    const treasurerBtn = document.createElement("button");
-    treasurerBtn.id          = "treasurer-btn";
-    treasurerBtn.textContent = "Treasurer portal";
-    treasurerBtn.addEventListener("click", () => {
-      window.location.href = `group-treasurer.html?groupId=${group.groupId}`;
-    });
-    footer.appendChild(treasurerBtn);
-  }
+  const viewNotificationsBtn = document.createElement("button");
+  viewNotificationsBtn.id = "view-notifications-btn";
+  viewNotificationsBtn.textContent = "Notifications";
+  
+  viewNotificationsBtn.addEventListener("click", () => {
+    badgeWrapper.classList.remove("has-notification");
+    loadAndShowNotifications(group.groupId);
+  });
 
-  // NOTE: openInitiatePayoutModal has been removed from here.
-  // Payout initiation is now handled exclusively in group-treasurer.html
-  // via group-treasurer.js. Treasurers are redirected there via the button above.
+  badgeWrapper.appendChild(viewNotificationsBtn);
+  footer.appendChild(badgeWrapper);
+
+  // Check if we should show the red dot immediately
+  checkNewNotifications(group.groupId, badgeWrapper);
+}
+
+// Helper to check for the red dot
+async function checkNewNotifications(groupId, wrapper) {
+  try {
+    const meetings = await fetchMeetings(groupId);
+    if (meetings && meetings.length > 0) {
+      wrapper.classList.add("has-notification");
+    }
+  } catch (e) {
+    console.error("Badge check failed", e);
+  }
 }
 
 
