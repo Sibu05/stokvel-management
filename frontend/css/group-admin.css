@@ -229,6 +229,426 @@ hr.strip-divider {
 .back-link:hover { color: #034e52; }
 
 
+/* ── Payment status card ── */
+
+.payment-status-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+.payment-status-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.payment-status-icon.paid-icon {
+  background: #e0f7f6;
+  color: #034e52;
+}
+
+.payment-status-icon.pending-icon {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.payment-status-icon.unpaid-icon {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.payment-status-body {
+  flex: 1;
+}
+
+.payment-status-label {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+}
+
+.payment-status-label.paid-label {
+  color: #034e52;
+}
+
+.payment-status-label.pending-label {
+  color: #b45309;
+}
+
+.payment-status-label.unpaid-label {
+  color: #991b1b;
+}
+
+.payment-status-sub {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+.payment-ref {
+  display: block;
+  font-size: 10px;
+  color: #64748b;
+  font-family: monospace;
+  margin-top: 4px;
+}
+
+.pay-now-btn {
+  padding: 8px 20px;
+  background: linear-gradient(135deg, #2dd4bf 0%, #0e9490 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pay-now-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(14, 148, 144, 0.3);
+}
+
+
+/* ── Action footer ── */
+
+.action-footer {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0f7f6;
+}
+
+.action-footer button {
+  padding: 8px 20px;
+  background: #f0fafa;
+  color: #0e9490;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-footer button:hover {
+  background: #e0f7f6;
+  transform: translateY(-1px);
+}
+
+
+/* ── Modal styles ── */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 900px;
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-bottom: 1.5px solid #e0f7f6;
+  background: white;
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #034e52;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #64748b;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.modal-close:hover {
+  background: #f0fafa;
+  color: #034e52;
+}
+
+.modal-section {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Payment modal specific */
+.payment-modal {
+  max-width: 450px;
+}
+
+.payment-confirm-body {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.payment-amount-display {
+  font-size: 28px;
+  font-weight: 700;
+  color: #034e52;
+  margin: 0 0 1rem 0;
+}
+
+.payment-confirm-desc {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e0f7f6;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.print-btn {
+  padding: 8px 20px;
+  background: #f0fafa;
+  color: #64748b;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.print-btn:hover {
+  background: #e0f7f6;
+}
+
+.confirm-pay-btn {
+  padding: 8px 20px;
+  background: linear-gradient(135deg, #2dd4bf 0%, #0e9490 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.confirm-pay-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(14, 148, 144, 0.3);
+}
+
+.confirm-pay-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+
+/* ── Status banner ── */
+
+.status-banner {
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 1.25rem;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.status-banner.success {
+  background: #e0f7f6;
+  color: #034e52;
+  border-left: 3px solid #0e9490;
+}
+
+.status-banner.closed {
+  background: #fef2f2;
+  color: #991b1b;
+  border-left: 3px solid #ef4444;
+}
+
+
+/* ── Reports card styles (NEW) ── */
+
+#reports-card {
+    margin-top: 1.5rem;
+}
+
+.report-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.25rem 0;
+}
+
+.report-row:first-of-type {
+    padding-top: 0;
+}
+
+.report-info {
+    flex: 2;
+}
+
+.report-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #034e52;
+    margin: 0 0 4px 0;
+}
+
+.report-desc {
+    font-size: 12px;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.report-actions {
+    flex: 1;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+/* Report buttons - matching existing button colors but different font */
+.btn-report-view,
+.btn-export-csv,
+.btn-export-pdf {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    font-family: 'Courier New', 'Fira Code', 'Source Code Pro', monospace;
+    letter-spacing: 0.3px;
+}
+
+/* View button - matches btn-add style (teal gradient) */
+.btn-report-view {
+    background: linear-gradient(135deg, #2dd4bf 0%, #0e9490 100%);
+    color: white;
+    box-shadow: 0 2px 6px rgba(14, 148, 144, 0.25);
+}
+
+.btn-report-view:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(14, 148, 144, 0.35);
+}
+
+/* CSV button - neutral/outline style matching existing neutral elements */
+.btn-export-csv {
+    background: #f0fafa;
+    color: #0e9490;
+    border: 1px solid #cbd5e1;
+}
+
+.btn-export-csv:hover {
+    background: #e0f7f6;
+    transform: translateY(-1px);
+}
+
+/* PDF button - subtle accent matching existing badge colors */
+.btn-export-pdf {
+    background: #f8fafc;
+    color: #64748b;
+    border: 1px solid #cbd5e1;
+}
+
+.btn-export-pdf:hover {
+    background: #f1f5f9;
+    color: #034e52;
+    transform: translateY(-1px);
+}
+
+/* Disabled state for all report buttons */
+.btn-report-view:disabled,
+.btn-export-csv:disabled,
+.btn-export-pdf:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Report divider - matches existing strip-divider style */
+.report-divider {
+    margin: 0;
+    border: none;
+    height: 1px;
+    background: #e0f7f6;
+}
+
+/* Responsive: stack on smaller screens */
+@media (max-width: 640px) {
+    .report-row {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .report-actions {
+        justify-content: flex-start;
+        width: 100%;
+    }
+    
+    .btn-report-view,
+    .btn-export-csv,
+    .btn-export-pdf {
+        flex: 1;
+        text-align: center;
+    }
+}
+
+
 /* ── Fix browser defaults ── */
 
 i.logo-mark, i.member-initials, address.header-avatar { font-style: normal; }
