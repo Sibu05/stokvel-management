@@ -1,27 +1,3 @@
-function renderFooterButtons(group) {
-  const footer = document.querySelector(".action-footer");
-  footer.innerHTML = ""; 
-
-  //Create a container for the badge
-  const badgeWrapper = document.createElement("div");
-  badgeWrapper.className = "badge-container has-notification"; // Add "has-notification" to show the dot
-
-  const viewNotificationsBtn = document.createElement("button");
-  viewNotificationsBtn.id = "view-notifications-btn";
-  viewNotificationsBtn.textContent = "Notifications";
-
-  //Click Logic
-  viewNotificationsBtn.addEventListener("click", () => {
-    // Remove the notification dot immediately
-    badgeWrapper.classList.remove("has-notification");
-    
-    // Call the existing function to show the modal
-    loadAndShowNotifications(group.groupId);
-  });
-  badgeWrapper.appendChild(viewNotificationsBtn);
-  footer.appendChild(badgeWrapper);
-}
-
 async function fetchMeetings(groupId) {
     const token    = await auth0Client.getTokenSilently();
     const response = await fetch(`${config.apiBase}/api/meetings/group/${groupId}`, {
